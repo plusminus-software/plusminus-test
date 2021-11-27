@@ -15,6 +15,7 @@
  */
 package software.plusminus.test;
 
+import lombok.experimental.Delegate;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -36,31 +37,38 @@ import software.plusminus.selenium.model.WebTestOptions;
 @ActiveProfiles("test")
 public abstract class SeleniumTest implements Findable {
 
-    private static Selenium selenium;
-
+    private static Selenium staticSelenium;
+    
     @LocalServerPort
     private int port;
+    @Delegate
+    private Selenium selenium;
+    
 
     @BeforeClass
     public static void setUpClass() {
-        selenium = new Selenium();
-        selenium.openHeadlessBrowser();
+        staticSelenium = new Selenium();
+        
     }
 
     @AfterClass
     public static void tearDownClass() {
-        selenium.closeBrowser();
-        selenium = null;
+        staticSelenium.closeBrowser();
+        staticSelenium = null;
     }
 
     @Before
     public void setUp() {
-        selenium.loadPage(getOptions(), getUrlOrPath());
+        if (selenium == null) {
+            selenium = staticSelenium;
+            open();
+        }
+        loadPage(options(), url());
     }
 
     @After
     public void tearDown() {
-        selenium.checkErrorsInLogs();
+        checkErrorsInLogs();
     }
 
     @Override
@@ -72,11 +80,19 @@ public abstract class SeleniumTest implements Findable {
         return Element.of(canonical, selenium);
     }
 
-    protected WebTestOptions getOptions() {
+    protected WebTestOptions options() {
         return new WebTestOptions()
                 .port(port);
     }
 
-    protected abstract String getUrlOrPath();
+    protected abstract String url();
+    
+    private void open() {
+        if (options().headlessBrowser()) {
+            selenium.openHeadlessBrowser();
+        } else {
+            selenium.openBrowser();
+        }
+    }
 
 }
