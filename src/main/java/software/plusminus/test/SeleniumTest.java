@@ -53,7 +53,9 @@ public abstract class SeleniumTest implements Findable {
 
     @AfterClass
     public static void tearDownClass() {
-        staticSelenium.closeBrowser();
+        if (staticSelenium.driver() != null) {
+            staticSelenium.closeBrowser();
+        }
         staticSelenium = null;
     }
 
