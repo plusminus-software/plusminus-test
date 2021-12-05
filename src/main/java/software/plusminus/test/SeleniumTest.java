@@ -48,7 +48,6 @@ public abstract class SeleniumTest implements Findable {
     @BeforeClass
     public static void setUpClass() {
         staticSelenium = new Selenium();
-        
     }
 
     @AfterClass
@@ -63,7 +62,7 @@ public abstract class SeleniumTest implements Findable {
     public void setUp() {
         if (selenium == null) {
             selenium = staticSelenium;
-            open();
+            openBrowser(options());
         }
         loadPage(options(), url());
     }
@@ -88,13 +87,5 @@ public abstract class SeleniumTest implements Findable {
     }
 
     protected abstract String url();
-    
-    private void open() {
-        if (options().headlessBrowser()) {
-            selenium.openHeadlessBrowser();
-        } else {
-            selenium.openBrowser();
-        }
-    }
 
 }
