@@ -21,15 +21,14 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
-import org.openqa.selenium.WebElement;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
-import software.plusminus.selenium.Element;
 import software.plusminus.selenium.Findable;
 import software.plusminus.selenium.Finder;
 import software.plusminus.selenium.Selenium;
+import software.plusminus.selenium.WebElement;
 import software.plusminus.selenium.model.WebTestOptions;
 
 @RunWith(SpringRunner.class)
@@ -77,8 +76,8 @@ public abstract class SeleniumTest implements Findable {
         return new Finder(selenium);
     }
     
-    public Element wrap(WebElement canonical) {
-        return Element.of(canonical, selenium);
+    public WebElement wrap(org.openqa.selenium.WebElement canonical) {
+        return WebElement.of(canonical, selenium);
     }
 
     protected WebTestOptions options() {
