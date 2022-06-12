@@ -20,29 +20,18 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.runner.RunWith;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
 import software.plusminus.selenium.Findable;
 import software.plusminus.selenium.Finder;
 import software.plusminus.selenium.Selenium;
 import software.plusminus.selenium.WebElement;
 import software.plusminus.selenium.model.WebTestOptions;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
-public abstract class SeleniumTest implements Findable {
+public abstract class SeleniumTest extends IntegrationTest implements Findable {
 
     private static Selenium staticSelenium;
     
-    @LocalServerPort
-    private int port;
     @Delegate
     private Selenium selenium;
-    
 
     @BeforeClass
     public static void setUpClass() {
@@ -82,7 +71,7 @@ public abstract class SeleniumTest implements Findable {
 
     protected WebTestOptions options() {
         return new WebTestOptions()
-                .port(port);
+                .port(port());
     }
 
     protected abstract String url();
