@@ -25,6 +25,8 @@ import software.plusminus.selenium.Finder;
 import software.plusminus.selenium.Selenium;
 import software.plusminus.selenium.WebElement;
 import software.plusminus.selenium.model.WebTestOptions;
+import software.plusminus.test.annotation.TestBrowser;
+import software.plusminus.util.AnnotationUtils;
 
 public abstract class SeleniumTest extends IntegrationTest implements Findable {
 
@@ -48,11 +50,12 @@ public abstract class SeleniumTest extends IntegrationTest implements Findable {
 
     @Before
     public void setUp() {
+        WebTestOptions options = mergedOptions();
         if (selenium == null) {
             selenium = staticSelenium;
-            openBrowser(options());
+            openBrowser(options);
         }
-        loadPage(options(), url());
+        loadPage(options, url());
     }
 
     @After
@@ -75,5 +78,18 @@ public abstract class SeleniumTest extends IntegrationTest implements Findable {
     }
 
     protected abstract String url();
-
+    
+    private WebTestOptions mergedOptions() {
+        WebTestOptions options = options();
+        mergeTestBrowser(options);
+        return options;
+    }
+    
+    private void mergeTestBrowser(WebTestOptions options) {
+        TestBrowser testBrowser = AnnotationUtils.findAnnotation(TestBrowser.class, this);
+        if (testBrowser == null) {
+            return;
+        }
+        options.headlessBrowser(testBrowser.headless());
+    }
 }
