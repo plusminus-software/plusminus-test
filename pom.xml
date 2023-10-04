@@ -61,9 +61,9 @@
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>software.plusminus</groupId>
-            <artifactId>plusminus-jwt-test</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>
