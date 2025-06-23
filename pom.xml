@@ -4,16 +4,16 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>software.plusminus</groupId>
-    <artifactId>plusminus-test</artifactId>
-    <version>1.0-SNAPSHOT</version>
-
     <parent>
         <groupId>software.plusminus</groupId>
-        <artifactId>plusminus-opensource</artifactId>
+        <artifactId>plusminus-parent-public</artifactId>
         <version>1.0-SNAPSHOT</version>
         <relativePath/>
     </parent>
+
+    <groupId>software.plusminus</groupId>
+    <artifactId>plusminus-test</artifactId>
+    <version>1.0-SNAPSHOT</version>
 
     <name>Plusminus Test</name>
     <description>Set of test dependencies.</description>
@@ -43,6 +43,7 @@
         <connection>scm:git:git://github.com/plusminus-software/plusminus-test.git</connection>
         <developerConnection>scm:git:ssh://github.com:plusminus-software/plusminus-test.git</developerConnection>
         <url>https://github.com/plusminus-software/plusminus-test/tree/main</url>
+        <tag>HEAD</tag>
     </scm>
 
     <dependencies>
@@ -66,4 +67,17 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>sonatype-central-snapshots</id>
+            <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 </project>
