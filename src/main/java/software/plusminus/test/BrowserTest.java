@@ -28,7 +28,7 @@ import software.plusminus.selenium.model.WebTestOptions;
 import software.plusminus.test.annotation.TestBrowser;
 import software.plusminus.util.AnnotationUtils;
 
-public abstract class SeleniumTest extends IntegrationTest implements Findable {
+public abstract class BrowserTest extends IntegrationTest implements Findable {
 
     private static Selenium staticSelenium;
     
@@ -36,12 +36,12 @@ public abstract class SeleniumTest extends IntegrationTest implements Findable {
     private Selenium selenium;
 
     @BeforeClass
-    public static void setUpClass() {
+    public static void startSelenium() {
         staticSelenium = new Selenium();
     }
 
     @AfterClass
-    public static void tearDownClass() {
+    public static void closeSelenium() {
         if (staticSelenium.driver() != null) {
             staticSelenium.closeBrowser();
         }
@@ -49,7 +49,7 @@ public abstract class SeleniumTest extends IntegrationTest implements Findable {
     }
 
     @Before
-    public void setUp() {
+    public void startPage() {
         WebTestOptions options = mergedOptions();
         if (selenium == null) {
             selenium = staticSelenium;
@@ -59,7 +59,7 @@ public abstract class SeleniumTest extends IntegrationTest implements Findable {
     }
 
     @After
-    public void tearDown() {
+    public void endPage() {
         checkErrorsInLogs();
     }
 
@@ -81,11 +81,11 @@ public abstract class SeleniumTest extends IntegrationTest implements Findable {
     
     private WebTestOptions mergedOptions() {
         WebTestOptions options = options();
-        mergeTestBrowser(options);
+        mergeTestBrowserAnnotation(options);
         return options;
     }
     
-    private void mergeTestBrowser(WebTestOptions options) {
+    private void mergeTestBrowserAnnotation(WebTestOptions options) {
         TestBrowser testBrowser = AnnotationUtils.findAnnotation(TestBrowser.class, this);
         if (testBrowser == null) {
             return;

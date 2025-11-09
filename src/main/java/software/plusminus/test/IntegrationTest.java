@@ -1,34 +1,42 @@
-/*
- * Copyright 2021 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package software.plusminus.test;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import software.plusminus.context.Context;
+import software.plusminus.test.util.DatabaseCleaner;
+import software.plusminus.test.util.DatabaseLog;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@ActiveProfiles({ "test", "integration-test" })
 public abstract class IntegrationTest {
     
     @LocalServerPort
     private int port;
-    
+    @Autowired
+    private DatabaseCleaner databaseCleaner;
+
+    @Before
+    public void initContext() {
+        Context.init();
+    }
+
+    @After
+    public void clearContext() {
+        Context.clear();
+    }
+
+    @After
+    public void cleanupDatabase() {
+        databaseCleaner.cleanupDatabase();
+        DatabaseLog.clear();
+    }
 
     protected int port() {
         return port;

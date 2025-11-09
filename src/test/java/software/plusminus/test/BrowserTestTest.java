@@ -5,7 +5,7 @@ import software.plusminus.selenium.model.WebTestOptions;
 
 import static software.plusminus.check.Checks.check;
 
-public class SeleniumTestTest extends SeleniumTest {
+public class BrowserTestTest extends BrowserTest {
 
     @Override
     protected WebTestOptions options() {

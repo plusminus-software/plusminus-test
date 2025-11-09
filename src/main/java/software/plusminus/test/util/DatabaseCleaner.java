@@ -1,0 +1,123 @@
+package software.plusminus.test.util;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import javax.annotation.Nullable;
+import javax.sql.DataSource;
+
+@Component
+@SuppressFBWarnings("SQL_INJECTION_JDBC")
+public class DatabaseCleaner {
+
+    private static final String POSTGRESQL = "postgresql";
+    private static final String MYSQL = "mysql";
+    private static final String H2 = "h2";
+    private static final Set<String> SUPPORTED_DBS = new HashSet<>(Arrays.asList(POSTGRESQL, MYSQL, H2));
+
+    private DataSource dataSource;
+
+    public DatabaseCleaner(@Nullable DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
+
+    @Autowired
+    void foolproof(Environment environment) {
+        boolean isTestEnvironment = Arrays.asList(environment.getActiveProfiles())
+                .contains("test");
+        if (!isTestEnvironment) {
+            throw new IllegalStateException("DatabaseCleaner must run only in test profiles");
+        }
+    }
+
+    public void cleanupDatabase() {
+        if (dataSource == null) {
+            return;
+        }
+        try (Connection connection = dataSource.getConnection()) {
+            connection.setAutoCommit(false);
+            String dbName = connection.getMetaData().getDatabaseProductName().toLowerCase();
+            if (!SUPPORTED_DBS.contains(dbName)) {
+                throw new IllegalStateException("Unsupported DB: " + dbName);
+            }
+            disableForeignKeys(connection, dbName);
+            List<String> tableNames = getAllTableNames(connection, dbName);
+            truncateTables(connection, dbName, tableNames);
+            enableForeignKeys(connection, dbName);
+            connection.commit();
+        } catch (SQLException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    private List<String> getAllTableNames(Connection connection, String dbName) throws SQLException {
+        String query;
+        if (dbName.contains(POSTGRESQL)) {
+            query = "SELECT table_name FROM information_schema.tables WHERE table_schema='public'";
+        } else if (dbName.contains(MYSQL)) {
+            query = "SHOW TABLES";
+        } else if (dbName.contains(H2)) {
+            query = "SHOW TABLES";
+        } else {
+            throw new IllegalStateException("Unsupported DB: " + dbName);
+        }
+
+        try (Statement stmt = connection.createStatement(); ResultSet rs = stmt.executeQuery(query)) {
+            List<String> tableNames = new ArrayList<>();
+            while (rs.next()) {
+                tableNames.add(rs.getString(1));
+            }
+            return tableNames;
+        }
+    }
+
+    private void disableForeignKeys(Connection connection, String dbName) throws SQLException {
+        try (Statement stmt = connection.createStatement()) {
+            if (dbName.contains(POSTGRESQL)) {
+                stmt.execute("SET session_replication_role = 'replica'");
+            } else if (dbName.contains(MYSQL)) {
+                stmt.execute("SET FOREIGN_KEY_CHECKS = 0");
+            } else if (dbName.contains(H2)) {
+                stmt.execute("SET REFERENTIAL_INTEGRITY FALSE");
+            }
+        }
+    }
+
+    private void truncateTables(Connection connection, String dbName, List<String> tableNames) throws SQLException {
+        try (Statement stmt = connection.createStatement()) {
+            for (String table : tableNames) {
+                if (dbName.contains(POSTGRESQL)) {
+                    stmt.execute("TRUNCATE TABLE " + table + " RESTART IDENTITY CASCADE");
+                } else if (dbName.contains(MYSQL)) {
+                    stmt.execute("TRUNCATE TABLE " + table);
+                } else if (dbName.contains(H2)) {
+                    stmt.execute("TRUNCATE TABLE " + table);
+                    stmt.execute("ALTER TABLE " + table + " ALTER COLUMN id RESTART WITH 1");
+                }
+            }
+        }
+    }
+
+    private void enableForeignKeys(Connection connection, String dbName) throws SQLException {
+        try (Statement stmt = connection.createStatement()) {
+            if (dbName.contains(POSTGRESQL)) {
+                stmt.execute("SET session_replication_role = 'origin'");
+            } else if (dbName.contains(MYSQL)) {
+                stmt.execute("SET FOREIGN_KEY_CHECKS = 1");
+            } else if (dbName.contains(H2)) {
+                stmt.execute("SET REFERENTIAL_INTEGRITY TRUE");
+            }
+        }
+    }
+}
