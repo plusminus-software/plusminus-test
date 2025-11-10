@@ -54,6 +54,7 @@ public class DatabaseCleaner {
             disableForeignKeys(connection, dbName);
             List<String> tableNames = getAllTableNames(connection, dbName);
             truncateTables(connection, dbName, tableNames);
+            resetSequences(connection, dbName);
             enableForeignKeys(connection, dbName);
             connection.commit();
         } catch (SQLException e) {
@@ -95,16 +96,29 @@ public class DatabaseCleaner {
     }
 
     private void truncateTables(Connection connection, String dbName, List<String> tableNames) throws SQLException {
+        String truncateTable = "TRUNCATE TABLE ";
         try (Statement stmt = connection.createStatement()) {
             for (String table : tableNames) {
                 if (dbName.contains(POSTGRESQL)) {
-                    stmt.execute("TRUNCATE TABLE " + table + " RESTART IDENTITY CASCADE");
+                    stmt.execute(truncateTable + table + " RESTART IDENTITY CASCADE");
                 } else if (dbName.contains(MYSQL)) {
-                    stmt.execute("TRUNCATE TABLE " + table);
+                    stmt.execute(truncateTable + table);
                 } else if (dbName.contains(H2)) {
-                    stmt.execute("TRUNCATE TABLE " + table);
-                    stmt.execute("ALTER TABLE " + table + " ALTER COLUMN id RESTART WITH 1");
+                    stmt.execute(truncateTable + table);
                 }
+            }
+        }
+    }
+
+    private void resetSequences(Connection connection, String dbName) throws SQLException {
+        if (dbName.contains(H2)) {
+            try (Statement stmt = connection.createStatement();
+                 ResultSet rs = stmt.executeQuery("SELECT SEQUENCE_NAME FROM INFORMATION_SCHEMA.SEQUENCES")) {
+                while (rs.next()) {
+                    String sequenceName = rs.getString(1);
+                    stmt.addBatch("ALTER SEQUENCE " + sequenceName + " RESTART WITH 1");
+                }
+                stmt.executeBatch();
             }
         }
     }
