@@ -27,6 +27,7 @@ public class DatabaseCleaner {
     private static final Set<String> SUPPORTED_DBS = new HashSet<>(Arrays.asList(POSTGRESQL, MYSQL, H2));
 
     private DataSource dataSource;
+    private boolean isTestEnvironment;
 
     public DatabaseCleaner(@Nullable DataSource dataSource) {
         this.dataSource = dataSource;
@@ -34,14 +35,12 @@ public class DatabaseCleaner {
 
     @Autowired
     void foolproof(Environment environment) {
-        boolean isTestEnvironment = Arrays.asList(environment.getActiveProfiles())
+        this.isTestEnvironment = Arrays.asList(environment.getActiveProfiles())
                 .contains("test");
-        if (!isTestEnvironment) {
-            throw new IllegalStateException("DatabaseCleaner must run only in test profiles");
-        }
     }
 
     public void cleanupDatabase() {
+        checkIsTestEnvironment();
         if (dataSource == null) {
             return;
         }
@@ -132,6 +131,12 @@ public class DatabaseCleaner {
             } else if (dbName.contains(H2)) {
                 stmt.execute("SET REFERENTIAL_INTEGRITY TRUE");
             }
+        }
+    }
+
+    private void checkIsTestEnvironment() {
+        if (!isTestEnvironment) {
+            throw new IllegalStateException("DatabaseCleaner must run only in test profiles");
         }
     }
 }

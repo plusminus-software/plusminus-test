@@ -37,23 +37,4 @@ public class DatabaseLog implements StatementInspector {
         }
         queries.clear();
     }
-
-    public static String explainLastSql(Object... parameters) {
-        String lastSql = DatabaseLog.getLastSql();
-        if (lastSql == null) {
-            throw new IllegalStateException("There is no queries to explain");
-        }
-        long questionCount = lastSql.chars()
-                .filter(c -> c == '?')
-                .count();
-        if (parameters.length != questionCount) {
-            throw new IllegalArgumentException("Cannot explain last sql: the query expected "
-                    + questionCount + " parameters where there are " + parameters.length + " provided");
-        }
-        String explainSql = "EXPLAIN " + lastSql;
-        for (Object parameter : parameters) {
-            explainSql = explainSql.replaceFirst("\\?", parameter.toString());
-        }
-        return explainSql;
-    }
 }
