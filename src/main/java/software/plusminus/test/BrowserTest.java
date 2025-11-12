@@ -77,6 +77,7 @@ public abstract class BrowserTest extends IntegrationTest implements Findable {
                 .port(port());
     }
 
+    @Override
     protected abstract String url();
     
     private WebTestOptions mergedOptions() {

@@ -7,7 +7,7 @@ import software.plusminus.test.fixtures.TestEntity;
 
 import static software.plusminus.check.Checks.check;
 
-public class DatabaseCleanerTest extends IntegrationTest {
+public class TestDatabaseCleanerTest extends IntegrationTest {
 
     @Autowired
     private TransactionEntityManager entityManager;

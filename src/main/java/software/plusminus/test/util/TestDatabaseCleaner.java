@@ -19,7 +19,7 @@ import javax.sql.DataSource;
 
 @Component
 @SuppressFBWarnings("SQL_INJECTION_JDBC")
-public class DatabaseCleaner {
+public class TestDatabaseCleaner {
 
     private static final String POSTGRESQL = "postgresql";
     private static final String MYSQL = "mysql";
@@ -29,7 +29,7 @@ public class DatabaseCleaner {
     private DataSource dataSource;
     private boolean isTestEnvironment;
 
-    public DatabaseCleaner(@Nullable DataSource dataSource) {
+    public TestDatabaseCleaner(@Nullable DataSource dataSource) {
         this.dataSource = dataSource;
     }
 

@@ -8,7 +8,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 @Component
-public class DatabaseLog implements StatementInspector {
+public class TestDatabaseLog implements StatementInspector {
 
     private static final ThreadLocal<List<String>> QUERIES = new ThreadLocal<>();
 

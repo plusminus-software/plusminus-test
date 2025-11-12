@@ -3,7 +3,7 @@ package software.plusminus.test.util;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
-public class DatabaseUtils {
+public class TestDatabaseUtils {
 
     public String updateQueryWithParameters(String originalQuery, String... parameters) {
         long questionMarksCount = originalQuery.chars()
