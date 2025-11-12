@@ -12,7 +12,7 @@ import javax.transaction.Transactional;
 @Component
 @Transactional
 @SuppressFBWarnings("SQL_INJECTION_JPA")
-public class TransactionEntityManager {
+public class TestEntityManager {
 
     @Delegate
     private EntityManager entityManager;

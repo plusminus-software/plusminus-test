@@ -14,14 +14,16 @@ import org.springframework.test.context.junit4.SpringRunner;
 import software.plusminus.context.Context;
 import software.plusminus.test.util.TestDatabaseCleaner;
 import software.plusminus.test.util.TestDatabaseLog;
-import software.plusminus.test.util.TransactionEntityManager;
+import software.plusminus.test.util.TestEntityManager;
+import software.plusminus.test.util.TestRestTemplate;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@ActiveProfiles({ "test", "integration-test" })
-@Import({TestDatabaseCleaner.class, TestDatabaseLog.class, TransactionEntityManager.class})
+@ActiveProfiles({"test", "integration-test"})
+@Import({TestDatabaseCleaner.class, TestDatabaseLog.class,
+         TestEntityManager.class, TestRestTemplate.class})
 public abstract class IntegrationTest {
-    
+
     @LocalServerPort
     private int port;
     @Autowired

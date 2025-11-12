@@ -10,7 +10,7 @@ import static software.plusminus.check.Checks.check;
 public class TestDatabaseLogTest extends IntegrationTest {
 
     @Autowired
-    private TransactionEntityManager entityManager;
+    private TestEntityManager entityManager;
 
     @Test
     public void getLastSql() {
