@@ -44,4 +44,8 @@ public abstract class IntegrationTest {
     protected int port() {
         return port;
     }
+
+    protected String url() {
+        return "http://localhost:" + port + "/";
+    }
 }
