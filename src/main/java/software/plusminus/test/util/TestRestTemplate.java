@@ -1,8 +1,7 @@
 package software.plusminus.test.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import lombok.experimental.Delegate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -13,21 +12,31 @@ import org.springframework.stereotype.Component;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 
 import static software.plusminus.check.Checks.check;
 
-@ConditionalOnClass(org.springframework.boot.test.web.client.TestRestTemplate.class)
 @Component
 public class TestRestTemplate {
 
-    @Autowired
+    @Nullable
     private ObjectMapper objectMapper;
-    @Autowired
+    @Nullable
+    @Delegate
     private org.springframework.boot.test.web.client.TestRestTemplate restTemplate;
+
+    public TestRestTemplate(@Nullable ObjectMapper objectMapper,
+                            @Nullable org.springframework.boot.test.web.client.TestRestTemplate restTemplate) {
+        this.objectMapper = objectMapper;
+        this.restTemplate = restTemplate;
+    }
 
     @SuppressWarnings("PMD.LooseCoupling")
     public <T> Page<T> getPage(String url, Class<T> type) {
+        Objects.requireNonNull(objectMapper);
+        Objects.requireNonNull(restTemplate);
         ResponseEntity<? extends Map> response = restTemplate.getForEntity(url, LinkedHashMap.class);
         check(response.getStatusCode()).is(HttpStatus.OK);
         Map<?, ?> body = response.getBody();
