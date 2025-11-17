@@ -18,7 +18,7 @@ import software.plusminus.test.util.TestEntityManager;
 import software.plusminus.test.util.TestRestTemplate;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles({"test", "integration-test"})
 @Import({TestDatabaseCleaner.class, TestDatabaseLog.class,
          TestEntityManager.class, TestRestTemplate.class})
