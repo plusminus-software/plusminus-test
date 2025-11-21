@@ -20,6 +20,8 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import software.plusminus.selenium.Findable;
 import software.plusminus.selenium.Finder;
 import software.plusminus.selenium.Selenium;
@@ -48,8 +50,11 @@ public abstract class BrowserTest extends IntegrationTest implements Findable {
         staticSelenium = null;
     }
 
+    @Override
     @Before
-    public void startPage() {
+    @BeforeEach
+    public void beforeEach() {
+        super.beforeEach();
         WebTestOptions options = mergedOptions();
         if (selenium == null) {
             selenium = staticSelenium;
@@ -58,8 +63,11 @@ public abstract class BrowserTest extends IntegrationTest implements Findable {
         loadPage(options, url());
     }
 
+    @Override
     @After
-    public void endPage() {
+    @AfterEach
+    public void afterEach() {
+        super.afterEach();
         checkErrorsInLogs();
     }
 

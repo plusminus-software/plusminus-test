@@ -1,4 +1,4 @@
-package software.plusminus.test.util;
+package software.plusminus.test.helpers.database;
 
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,7 +7,7 @@ import software.plusminus.test.fixtures.TestEntity;
 
 import static software.plusminus.check.Checks.check;
 
-public class TestDatabaseCleanerTest extends IntegrationTest {
+public class JdbcDatabaseManagerTest extends IntegrationTest {
 
     @Autowired
     private TestEntityManager entityManager;

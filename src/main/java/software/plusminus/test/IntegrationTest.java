@@ -11,41 +11,30 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
-import software.plusminus.context.Context;
-import software.plusminus.test.util.TestDatabaseCleaner;
-import software.plusminus.test.util.TestDatabaseLog;
-import software.plusminus.test.util.TestEntityManager;
-import software.plusminus.test.util.TestRestTemplate;
+import software.plusminus.test.helpers.TestConfiguration;
 
+@SuppressWarnings("java:S6813")
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles({"test", "integration-test"})
-@Import({TestDatabaseCleaner.class, TestDatabaseLog.class,
-         TestEntityManager.class, TestRestTemplate.class})
+@Import(TestConfiguration.class)
 public abstract class IntegrationTest {
 
     @LocalServerPort
     private int port;
     @Autowired
-    private TestDatabaseCleaner databaseCleaner;
+    private TestManager manager;
 
     @Before
     @BeforeEach
-    public void initContext() {
-        Context.init();
+    public void beforeEach() {
+        manager.beforeEach();
     }
 
     @After
     @AfterEach
-    public void clearContext() {
-        Context.clear();
-    }
-
-    @After
-    @AfterEach
-    public void cleanupDatabase() {
-        databaseCleaner.cleanupDatabase();
-        TestDatabaseLog.clear();
+    public void afterEach() {
+        manager.afterEach();
     }
 
     protected int port() {
@@ -54,5 +43,9 @@ public abstract class IntegrationTest {
 
     protected String url() {
         return "http://localhost:" + port;
+    }
+
+    protected TestManager manager() {
+        return manager;
     }
 }

@@ -1,4 +1,4 @@
-package software.plusminus.test.util;
+package software.plusminus.test.helpers.database;
 
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,8 +7,10 @@ import software.plusminus.test.fixtures.TestEntity;
 
 import static software.plusminus.check.Checks.check;
 
-public class TestDatabaseLogTest extends IntegrationTest {
+public class HibernateDatabaseLogTest extends IntegrationTest {
 
+    @Autowired
+    private HibernateDatabaseLog databaseLog;
     @Autowired
     private TestEntityManager entityManager;
 
@@ -18,8 +20,8 @@ public class TestDatabaseLogTest extends IntegrationTest {
         entity.setStringField("my string");
         entityManager.persist(entity);
 
-        String lastSql = TestDatabaseLog.getLastSql();
+        String lastSql = databaseLog.getLastSql();
 
-        check(lastSql).is("insert into test_entity (id, string_field) values (default, ?)");
+        check(lastSql).is("insert into test_entity (id, string_field) values (null, ?)");
     }
 }

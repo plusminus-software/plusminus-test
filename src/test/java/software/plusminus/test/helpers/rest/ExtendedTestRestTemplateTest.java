@@ -1,21 +1,18 @@
-package software.plusminus.test.util;
+package software.plusminus.test.helpers.rest;
 
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import software.plusminus.test.IntegrationTest;
 import software.plusminus.test.fixtures.TestEntity;
 
 import static software.plusminus.check.Checks.check;
 
-public class TestRestTemplateTest extends IntegrationTest {
-
-    @Autowired
-    private TestRestTemplate testRestTemplate;
+public class ExtendedTestRestTemplateTest extends IntegrationTest {
 
     @Test
     public void getPage() {
-        Page<TestEntity> page = testRestTemplate.getPage(url() + "/page?size=1&page=2", TestEntity.class);
+        Page<TestEntity> page = manager().restTemplate().getForGenericObject(
+                url() + "/page?size={size}&page={page}", Page.class, TestEntity.class, 1, 2);
         check(page.getTotalPages()).is(3);
         check(page.getNumber()).is(2);
         check(page.getTotalElements()).is(3);

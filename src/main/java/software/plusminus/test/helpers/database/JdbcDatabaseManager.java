@@ -1,9 +1,7 @@
-package software.plusminus.test.util;
+package software.plusminus.test.helpers.database;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Component;
+import lombok.AllArgsConstructor;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -14,12 +12,11 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import javax.annotation.Nullable;
 import javax.sql.DataSource;
 
-@Component
+@AllArgsConstructor
 @SuppressFBWarnings("SQL_INJECTION_JDBC")
-public class TestDatabaseCleaner {
+public class JdbcDatabaseManager implements TestDatabaseManager {
 
     private static final String POSTGRESQL = "postgresql";
     private static final String MYSQL = "mysql";
@@ -27,23 +24,9 @@ public class TestDatabaseCleaner {
     private static final Set<String> SUPPORTED_DBS = new HashSet<>(Arrays.asList(POSTGRESQL, MYSQL, H2));
 
     private DataSource dataSource;
-    private boolean isTestEnvironment;
 
-    public TestDatabaseCleaner(@Nullable DataSource dataSource) {
-        this.dataSource = dataSource;
-    }
-
-    @Autowired
-    void foolproof(Environment environment) {
-        this.isTestEnvironment = Arrays.asList(environment.getActiveProfiles())
-                .contains("test");
-    }
-
+    @Override
     public void cleanupDatabase() {
-        checkIsTestEnvironment();
-        if (dataSource == null) {
-            return;
-        }
         try (Connection connection = dataSource.getConnection()) {
             connection.setAutoCommit(false);
             String dbName = connection.getMetaData().getDatabaseProductName().toLowerCase();
@@ -59,6 +42,22 @@ public class TestDatabaseCleaner {
         } catch (SQLException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    @Override
+    public String updateQueryWithParameters(String originalQuery, String... parameters) {
+        long questionMarksCount = originalQuery.chars()
+                .filter(c -> c == '?')
+                .count();
+        if (parameters.length != questionMarksCount) {
+            throw new IllegalArgumentException("Cannot update query: the query expected "
+                    + questionMarksCount + " parameters where there are " + parameters.length + " provided");
+        }
+        String updatedQuery = originalQuery;
+        for (Object parameter : parameters) {
+            updatedQuery = updatedQuery.replaceFirst("\\?", parameter.toString());
+        }
+        return updatedQuery;
     }
 
     private List<String> getAllTableNames(Connection connection, String dbName) throws SQLException {
@@ -131,12 +130,6 @@ public class TestDatabaseCleaner {
             } else if (dbName.contains(H2)) {
                 stmt.execute("SET REFERENTIAL_INTEGRITY TRUE");
             }
-        }
-    }
-
-    private void checkIsTestEnvironment() {
-        if (!isTestEnvironment) {
-            throw new IllegalStateException("DatabaseCleaner must run only in test profiles");
         }
     }
 }

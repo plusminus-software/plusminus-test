@@ -1,14 +1,16 @@
-package software.plusminus.test.util;
+package software.plusminus.test.helpers.database;
 
 import org.hibernate.resource.jdbc.spi.StatementInspector;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
 
+@ConditionalOnClass(StatementInspector.class)
 @Component
-public class TestDatabaseLog implements StatementInspector {
+public class HibernateDatabaseLog implements TestDatabaseLog, StatementInspector {
 
     private static final ThreadLocal<List<String>> QUERIES = new ThreadLocal<>();
 
@@ -21,8 +23,9 @@ public class TestDatabaseLog implements StatementInspector {
         return sql;
     }
 
+    @Override
     @Nullable
-    public static String getLastSql() {
+    public String getLastSql() {
         List<String> queries = QUERIES.get();
         if (queries == null || queries.isEmpty()) {
             return null;
@@ -30,11 +33,8 @@ public class TestDatabaseLog implements StatementInspector {
         return queries.get(queries.size() - 1);
     }
 
-    public static void clear() {
-        List<String> queries = QUERIES.get();
-        if (queries == null || queries.isEmpty()) {
-            return;
-        }
-        queries.clear();
+    @Override
+    public void clear() {
+        QUERIES.remove();
     }
 }
