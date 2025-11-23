@@ -7,6 +7,8 @@ import software.plusminus.context.Context;
 import software.plusminus.security.Security;
 import software.plusminus.test.helpers.TestHelper;
 
+import java.util.Optional;
+
 import static org.mockito.Mockito.when;
 
 @ConditionalOnClass(Security.class)
@@ -18,5 +20,6 @@ public class TestSecurityContext implements TestHelper {
 
     public void withSecurity(Security security) {
         when(securityContext.get()).thenReturn(security);
+        when(securityContext.optional()).thenReturn(Optional.of(security));
     }
 }
