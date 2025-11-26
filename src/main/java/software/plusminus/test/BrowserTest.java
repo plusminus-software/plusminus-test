@@ -16,12 +16,8 @@
 package software.plusminus.test;
 
 import lombok.experimental.Delegate;
-import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import software.plusminus.selenium.Findable;
 import software.plusminus.selenium.Finder;
 import software.plusminus.selenium.Selenium;
@@ -51,8 +47,6 @@ public abstract class BrowserTest extends IntegrationTest implements Findable {
     }
 
     @Override
-    @Before
-    @BeforeEach
     public void beforeEach() {
         super.beforeEach();
         WebTestOptions options = mergedOptions();
@@ -64,8 +58,6 @@ public abstract class BrowserTest extends IntegrationTest implements Findable {
     }
 
     @Override
-    @After
-    @AfterEach
     public void afterEach() {
         super.afterEach();
         checkErrorsInLogs();
