@@ -5,9 +5,11 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import software.plusminus.authentication.annotation.Public;
 
 import java.util.Collections;
 
+@Public
 @RestController
 public class TestController {
 

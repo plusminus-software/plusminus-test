@@ -67,6 +67,13 @@
             <groupId>software.plusminus</groupId>
             <artifactId>plusminus-security-core</artifactId>
             <version>1.0-SNAPSHOT</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>software.plusminus</groupId>
+            <artifactId>plusminus-jwt</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -97,6 +104,12 @@
             <artifactId>javax.interceptor-api</artifactId>
             <version>1.2</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.15.1</version>
+            <optional>true</optional>
         </dependency>
     </dependencies>
 
