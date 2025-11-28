@@ -3,6 +3,7 @@ package software.plusminus.test;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import software.plusminus.security.Security;
+import software.plusminus.security.service.TokenProcessor;
 import software.plusminus.test.helpers.TestHelper;
 import software.plusminus.test.helpers.context.TestContextManager;
 import software.plusminus.test.helpers.context.TestSecurityContext;
@@ -11,6 +12,8 @@ import software.plusminus.test.helpers.database.TestDatabaseManager;
 import software.plusminus.test.helpers.database.TestEntityManager;
 import software.plusminus.test.helpers.rest.ExtendedTestRestTemplate;
 
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @AllArgsConstructor
@@ -23,6 +26,7 @@ public class TestManager implements TestHelper {
     private Optional<TestDatabaseManager> databaseManager;
     private Optional<TestEntityManager> entityManager;
     private Optional<ExtendedTestRestTemplate> restTemplate;
+    private List<TokenProcessor> tokenProcessors;
 
     void beforeEach() {
         contextManager.ifPresent(TestContextManager::init);
@@ -67,5 +71,13 @@ public class TestManager implements TestHelper {
             throw new IllegalStateException("No security context is present");
         }
         securityContext.ifPresent(s -> s.withSecurity(security));
+    }
+
+    public String generateToken(Security security) {
+        return tokenProcessors.stream()
+                .map(tokenProcessor -> tokenProcessor.getToken(security))
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElseThrow(IllegalStateException::new);
     }
 }
