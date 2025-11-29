@@ -12,6 +12,7 @@ public class TestDatabaseManager {
     private Optional<TestDatabaseHelper> databaseHelper;
     private Optional<TestDatabaseLog> databaseLog;
     private Optional<TestEntityManager> entityManager;
+    private Optional<TestTransactionHelper> transactionHelper;
 
     public void cleanup() {
         databaseHelper.ifPresent(TestDatabaseHelper::cleanupDatabase);
@@ -30,5 +31,12 @@ public class TestDatabaseManager {
             throw new IllegalStateException("No entity manager is present");
         }
         return entityManager.get();
+    }
+
+    public TestTransactionHelper transaction() {
+        if (!transactionHelper.isPresent()) {
+            throw new IllegalStateException("No transaction module is present");
+        }
+        return transactionHelper.get();
     }
 }

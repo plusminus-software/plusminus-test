@@ -23,6 +23,7 @@ class IntegrationTestTest extends IntegrationTest {
         checkOptionalField(databaseManager, "databaseHelper");
         checkOptionalField(databaseManager, "databaseLog");
         checkOptionalField(databaseManager, "entityManager");
+        checkOptionalField(databaseManager, "transactionHelper");
 
         TestRestManager restManager = rest();
         checkOptionalField(restManager, "pageRestTemplate");
