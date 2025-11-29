@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @ConditionalOnClass(Page.class)
 @Component
-public class ExtendedTestRestTemplate implements TestHelper {
+public class TestPageRestTemplate implements TestHelper {
 
     private ObjectMapper objectMapper;
     private TestRestTemplate testRestTemplate;

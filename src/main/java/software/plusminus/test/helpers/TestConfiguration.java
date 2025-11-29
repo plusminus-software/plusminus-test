@@ -3,8 +3,8 @@ package software.plusminus.test.helpers;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import software.plusminus.test.helpers.database.JdbcDatabaseManager;
-import software.plusminus.test.helpers.database.TestDatabaseManager;
+import software.plusminus.test.helpers.database.JdbcDatabaseHelper;
+import software.plusminus.test.helpers.database.TestDatabaseHelper;
 
 import java.util.Optional;
 import javax.sql.DataSource;
@@ -14,9 +14,9 @@ import javax.sql.DataSource;
 public class TestConfiguration implements TestHelper {
 
     @Bean
-    TestDatabaseManager testDatabaseManager(Optional<DataSource> dataSource) {
+    TestDatabaseHelper testDatabaseHelper(Optional<DataSource> dataSource) {
         //TODO replace with @ConditionalOnBean(DataSource.class). For some reason it does not work.
-        return dataSource.map(JdbcDatabaseManager::new)
+        return dataSource.map(JdbcDatabaseHelper::new)
                 .orElse(null);
     }
 }

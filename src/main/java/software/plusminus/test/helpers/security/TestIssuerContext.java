@@ -1,4 +1,4 @@
-package software.plusminus.test.helpers.context;
+package software.plusminus.test.helpers.security;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.test.mock.mockito.SpyBean;
@@ -14,7 +14,7 @@ public class TestIssuerContext {
     @SpyBean
     private IssuerContext issuerContext;
 
-    public void setIssuer(String issuer) {
+    public void set(String issuer) {
         when(issuerContext.get()).thenReturn(issuer);
     }
 }

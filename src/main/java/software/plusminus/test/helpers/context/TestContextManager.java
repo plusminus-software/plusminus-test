@@ -25,7 +25,7 @@ public class TestContextManager implements TestHelper {
         Context.clear();
     }
 
-    public <T> void setValue(T value) {
+    public <T> void set(T value) {
         List<Context<T>> filteredContexts = contexts.stream()
                 .filter(context -> SpringUtil.resolveGenericType(context, Context.class) == value.getClass())
                 .map(context -> (Context<T>) context)
@@ -34,10 +34,10 @@ public class TestContextManager implements TestHelper {
             throw new IllegalStateException("Should find exactly one context for type " + value.getClass()
                     + " but found " + filteredContexts.size());
         }
-        setValue(filteredContexts.get(0), value);
+        set(filteredContexts.get(0), value);
     }
 
-    private <T> void setValue(Context<T> context, T value) {
+    private <T> void set(Context<T> context, T value) {
         Context.VALUES.get().put(context, value);
     }
 }

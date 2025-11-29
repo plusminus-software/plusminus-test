@@ -16,7 +16,7 @@ import javax.sql.DataSource;
 
 @AllArgsConstructor
 @SuppressFBWarnings("SQL_INJECTION_JDBC")
-public class JdbcDatabaseManager implements TestDatabaseManager {
+public class JdbcDatabaseHelper implements TestDatabaseHelper {
 
     private static final String POSTGRESQL = "postgresql";
     private static final String MYSQL = "mysql";

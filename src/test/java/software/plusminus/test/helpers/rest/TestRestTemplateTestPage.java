@@ -7,11 +7,11 @@ import software.plusminus.test.fixtures.TestEntity;
 
 import static software.plusminus.check.Checks.check;
 
-public class ExtendedTestRestTemplateTest extends IntegrationTest {
+public class TestRestTemplateTestPage extends IntegrationTest {
 
     @Test
     public void getPage() {
-        Page<TestEntity> page = manager().restTemplate().getForGenericObject(
+        Page<TestEntity> page = rest().restTemplate().getForGenericObject(
                 url() + "/page?size={size}&page={page}", Page.class, TestEntity.class, 1, 2);
         check(page.getTotalPages()).is(3);
         check(page.getNumber()).is(2);
