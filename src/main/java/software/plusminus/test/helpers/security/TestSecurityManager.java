@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import software.plusminus.context.Context;
 import software.plusminus.security.Security;
 import software.plusminus.security.service.TokenProcessor;
+import software.plusminus.test.helpers.TestHelper;
 
 import java.util.List;
 import java.util.Objects;
@@ -17,7 +18,7 @@ import static org.mockito.Mockito.when;
 @RequiredArgsConstructor
 @ConditionalOnClass(Security.class)
 @Component
-public class TestSecurityManager {
+public class TestSecurityManager implements TestHelper {
 
     @SpyBean
     private Context<Security> securityContext;

@@ -2,12 +2,13 @@ package software.plusminus.test.helpers.database;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
+import software.plusminus.test.helpers.TestHelper;
 
 import java.util.Optional;
 
 @AllArgsConstructor
 @Component
-public class TestDatabaseManager {
+public class TestDatabaseManager implements TestHelper {
 
     private Optional<TestDatabaseHelper> databaseHelper;
     private Optional<TestDatabaseLog> databaseLog;

@@ -4,12 +4,13 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.stereotype.Component;
 import software.plusminus.jwt.service.IssuerContext;
+import software.plusminus.test.helpers.TestHelper;
 
 import static org.mockito.Mockito.when;
 
 @ConditionalOnClass(IssuerContext.class)
 @Component
-public class TestIssuerContext {
+public class TestIssuerContext implements TestHelper {
 
     @SpyBean
     private IssuerContext issuerContext;

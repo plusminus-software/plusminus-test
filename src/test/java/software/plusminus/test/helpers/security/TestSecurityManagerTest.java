@@ -20,7 +20,7 @@ class TestSecurityManagerTest extends IntegrationTest {
                 .build());
         Security parsed = jwtParser.parseToken(token);
         check(parsed.getUsername()).is("test-user");
-        check(parsed.getOthers().containsKey("iss")).isFalse();
+        check(parsed.getParameters().containsKey("iss")).isFalse();
     }
 
     @Test
@@ -30,6 +30,6 @@ class TestSecurityManagerTest extends IntegrationTest {
                 .build(), "test-host");
         Security parsed = jwtParser.parseToken(token);
         check(parsed.getUsername()).is("test-user");
-        check(parsed.getOthers().get("iss")).is("test-host");
+        check(parsed.getParameters().get("iss")).is("test-host");
     }
 }
