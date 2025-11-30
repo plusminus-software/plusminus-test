@@ -11,6 +11,7 @@ public class TestRestTemplateTestPage extends IntegrationTest {
 
     @Test
     public void getPage() {
+        data().tenant().switchOffHibernateFilters();
         Page<TestEntity> page = rest().pageRestTemplate().getForGenericObject(
                 url() + "/page?size={size}&page={page}", Page.class, TestEntity.class, 1, 2);
         check(page.getTotalPages()).is(3);

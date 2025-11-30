@@ -8,6 +8,12 @@ import static software.plusminus.check.Checks.check;
 public class BrowserTestTest extends BrowserTest {
 
     @Override
+    public void beforeEach() {
+        data().tenant().switchOffHibernateFilters();
+        super.beforeEach();
+    }
+
+    @Override
     protected WebTestOptions options() {
         return super.options()
                 .logsFilter(log -> !log.getMessage().contains("favicon"));

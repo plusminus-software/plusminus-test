@@ -1,4 +1,4 @@
-package software.plusminus.test.helpers.database;
+package software.plusminus.test.helpers.data;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.AllArgsConstructor;

@@ -3,8 +3,8 @@ package software.plusminus.test.helpers;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import software.plusminus.test.helpers.database.JdbcDatabaseHelper;
-import software.plusminus.test.helpers.database.TestDatabaseHelper;
+import software.plusminus.test.helpers.data.JdbcDatabaseHelper;
+import software.plusminus.test.helpers.data.TestDatabaseHelper;
 
 import java.util.Optional;
 import javax.sql.DataSource;

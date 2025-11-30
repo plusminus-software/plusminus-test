@@ -1,4 +1,4 @@
-package software.plusminus.test.helpers.database;
+package software.plusminus.test.helpers.data;
 
 import org.hibernate.resource.jdbc.spi.StatementInspector;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;

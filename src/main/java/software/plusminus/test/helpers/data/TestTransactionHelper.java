@@ -1,4 +1,4 @@
-package software.plusminus.test.helpers.database;
+package software.plusminus.test.helpers.data;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.stereotype.Component;

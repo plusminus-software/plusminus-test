@@ -3,7 +3,7 @@ package software.plusminus.test;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 import software.plusminus.test.helpers.context.TestContextManager;
-import software.plusminus.test.helpers.database.TestDatabaseManager;
+import software.plusminus.test.helpers.data.TestDataManager;
 import software.plusminus.test.helpers.rest.TestRestManager;
 import software.plusminus.test.helpers.security.TestSecurityManager;
 
@@ -19,7 +19,7 @@ class IntegrationTestTest extends IntegrationTest {
         TestContextManager contextManager = context();
         checkListField(contextManager, "contexts");
 
-        TestDatabaseManager databaseManager = database();
+        TestDataManager databaseManager = data();
         checkOptionalField(databaseManager, "databaseHelper");
         checkOptionalField(databaseManager, "databaseLog");
         checkOptionalField(databaseManager, "entityManager");

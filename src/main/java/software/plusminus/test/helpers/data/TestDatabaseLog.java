@@ -1,4 +1,4 @@
-package software.plusminus.test.helpers.database;
+package software.plusminus.test.helpers.data;
 
 import software.plusminus.test.helpers.TestHelper;
 

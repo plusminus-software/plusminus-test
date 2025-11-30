@@ -1,4 +1,4 @@
-package software.plusminus.test.helpers.database;
+package software.plusminus.test.helpers.data;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -8,12 +8,13 @@ import java.util.Optional;
 
 @AllArgsConstructor
 @Component
-public class TestDatabaseManager implements TestHelper {
+public class TestDataManager implements TestHelper {
 
     private Optional<TestDatabaseHelper> databaseHelper;
     private Optional<TestDatabaseLog> databaseLog;
     private Optional<TestEntityManager> entityManager;
     private Optional<TestTransactionHelper> transactionHelper;
+    private Optional<TestTenantHelper> testTenantHelper;
 
     public void cleanup() {
         databaseHelper.ifPresent(TestDatabaseHelper::cleanupDatabase);
@@ -39,5 +40,12 @@ public class TestDatabaseManager implements TestHelper {
             throw new IllegalStateException("No transaction module is present");
         }
         return transactionHelper.get();
+    }
+
+    public TestTenantHelper tenant() {
+        if (!testTenantHelper.isPresent()) {
+            throw new IllegalStateException("No tenant module is present");
+        }
+        return testTenantHelper.get();
     }
 }

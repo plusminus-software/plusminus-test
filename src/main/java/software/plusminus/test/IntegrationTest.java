@@ -13,7 +13,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import software.plusminus.test.helpers.TestConfiguration;
 import software.plusminus.test.helpers.context.TestContextManager;
-import software.plusminus.test.helpers.database.TestDatabaseManager;
+import software.plusminus.test.helpers.data.TestDataManager;
 import software.plusminus.test.helpers.rest.TestRestManager;
 import software.plusminus.test.helpers.security.TestSecurityManager;
 
@@ -31,7 +31,7 @@ public abstract class IntegrationTest {
     @Autowired
     private Optional<TestContextManager> contextManager;
     @Autowired
-    private Optional<TestDatabaseManager> databaseManager;
+    private Optional<TestDataManager> dataManager;
     @Autowired
     private Optional<TestRestManager> restManager;
     @Autowired
@@ -47,7 +47,7 @@ public abstract class IntegrationTest {
     @AfterEach
     public void afterEach() {
         contextManager.ifPresent(TestContextManager::clear);
-        databaseManager.ifPresent(TestDatabaseManager::cleanup);
+        dataManager.ifPresent(TestDataManager::cleanup);
     }
 
     protected int port() {
@@ -63,8 +63,8 @@ public abstract class IntegrationTest {
                 .orElseThrow(() -> new IllegalStateException("No context module present"));
     }
 
-    public TestDatabaseManager database() {
-        return databaseManager
+    public TestDataManager data() {
+        return dataManager
                 .orElseThrow(() -> new IllegalStateException("No data module present"));
     }
 
