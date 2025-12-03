@@ -97,6 +97,9 @@ public class JdbcDatabaseHelper implements TestDatabaseHelper {
         String truncateTable = "TRUNCATE TABLE ";
         try (Statement stmt = connection.createStatement()) {
             for (String table : tableNames) {
+                if (!shouldTruncateTable(table)) {
+                    continue;
+                }
                 if (dbName.contains(POSTGRESQL)) {
                     stmt.execute(truncateTable + table + " RESTART IDENTITY CASCADE");
                 } else if (dbName.contains(MYSQL)) {
@@ -131,5 +134,12 @@ public class JdbcDatabaseHelper implements TestDatabaseHelper {
                 stmt.execute("SET REFERENTIAL_INTEGRITY TRUE");
             }
         }
+    }
+
+    private boolean shouldTruncateTable(String tableName) {
+        if (tableName.contains("flyway_schema_history")) {
+            return false;
+        }
+        return true;
     }
 }
