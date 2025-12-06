@@ -94,18 +94,18 @@ public class JdbcDatabaseHelper implements TestDatabaseHelper {
     }
 
     private void truncateTables(Connection connection, String dbName, List<String> tableNames) throws SQLException {
-        String truncateTable = "TRUNCATE TABLE ";
+        String deletePrefix = "DELETE FROM ";
         try (Statement stmt = connection.createStatement()) {
             for (String table : tableNames) {
                 if (!shouldTruncateTable(table)) {
                     continue;
                 }
                 if (dbName.contains(POSTGRESQL)) {
-                    stmt.execute(truncateTable + table + " RESTART IDENTITY CASCADE");
+                    stmt.execute(deletePrefix + table + " RESTART IDENTITY CASCADE");
                 } else if (dbName.contains(MYSQL)) {
-                    stmt.execute(truncateTable + table);
+                    stmt.execute(deletePrefix + table);
                 } else if (dbName.contains(H2)) {
-                    stmt.execute(truncateTable + table);
+                    stmt.execute(deletePrefix + table);
                 }
             }
         }
