@@ -12,6 +12,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.sql.DataSource;
 
 @AllArgsConstructor
@@ -22,6 +24,8 @@ public class JdbcDatabaseHelper implements TestDatabaseHelper {
     private static final String MYSQL = "mysql";
     private static final String H2 = "h2";
     private static final Set<String> SUPPORTED_DBS = new HashSet<>(Arrays.asList(POSTGRESQL, MYSQL, H2));
+    private static final Set<String> IGNORING_TABLES = Stream.of("flyway_schema_history")
+            .collect(Collectors.toSet());
 
     private DataSource dataSource;
 
@@ -97,7 +101,7 @@ public class JdbcDatabaseHelper implements TestDatabaseHelper {
         String deletePrefix = "DELETE FROM ";
         try (Statement stmt = connection.createStatement()) {
             for (String table : tableNames) {
-                if (!shouldTruncateTable(table)) {
+                if (IGNORING_TABLES.contains(table)) {
                     continue;
                 }
                 if (dbName.contains(POSTGRESQL)) {
@@ -134,12 +138,5 @@ public class JdbcDatabaseHelper implements TestDatabaseHelper {
                 stmt.execute("SET REFERENTIAL_INTEGRITY TRUE");
             }
         }
-    }
-
-    private boolean shouldTruncateTable(String tableName) {
-        if (tableName.contains("flyway_schema_history")) {
-            return false;
-        }
-        return true;
     }
 }
