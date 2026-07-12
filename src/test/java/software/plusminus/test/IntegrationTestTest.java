@@ -25,7 +25,7 @@ class IntegrationTestTest extends IntegrationTest {
         checkOptionalField(databaseManager, "transaction");
 
         TestWeb webManager = web();
-        checkOptionalField(webManager, "pageRestTemplate");
+        checkOptionalField(webManager, "pageTemplate");
 
         TestSecurity securityManager = security();
         checkField(securityManager, "securityService");

@@ -3,6 +3,7 @@ package software.plusminus.test.helper.context;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ReflectionUtils;
 import software.plusminus.context.ClearableContext;
 import software.plusminus.context.ConstantContext;
 import software.plusminus.context.Context;
@@ -46,7 +47,7 @@ public class TestContext implements TestHelper {
         } else if (context instanceof ThreadLocalContext) {
             setThreadLocalValue((ThreadLocalContext<T>) context, value);
         } else if (context instanceof ConstantContext) {
-            setPrivateField(context, "value", value);
+            setField(context, "value", value);
         } else {
             throw new IllegalStateException("Unsupported context type: " + context.getClass());
         }
@@ -54,27 +55,27 @@ public class TestContext implements TestHelper {
 
     @SuppressWarnings("unchecked")
     private <T> void setThreadLocalValue(ThreadLocalContext<T> context, T value) {
-        ThreadLocal<T> threadLocal = (ThreadLocal<T>) readPrivateField(context, "threadLocal");
+        ThreadLocal<T> threadLocal = (ThreadLocal<T>) readField(context, "threadLocal");
         threadLocal.set(value);
     }
 
-    private Object readPrivateField(Object target, String fieldName) {
-        try {
-            Field field = target.getClass().getDeclaredField(fieldName);
-            field.setAccessible(true);
-            return field.get(target);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new IllegalStateException("Cannot read field '" + fieldName + "' on " + target.getClass(), e);
-        }
+    private Object readField(Object target, String fieldName) {
+        Field field = findField(target, fieldName);
+        ReflectionUtils.makeAccessible(field);
+        return ReflectionUtils.getField(field, target);
     }
 
-    private void setPrivateField(Object target, String fieldName, Object value) {
-        try {
-            Field field = target.getClass().getDeclaredField(fieldName);
-            field.setAccessible(true);
-            field.set(target, value);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new IllegalStateException("Cannot set field '" + fieldName + "' on " + target.getClass(), e);
+    private void setField(Object target, String fieldName, Object value) {
+        Field field = findField(target, fieldName);
+        ReflectionUtils.makeAccessible(field);
+        ReflectionUtils.setField(field, target, value);
+    }
+
+    private Field findField(Object target, String fieldName) {
+        Field field = ReflectionUtils.findField(target.getClass(), fieldName);
+        if (field == null) {
+            throw new IllegalStateException("No field '" + fieldName + "' on " + target.getClass());
         }
+        return field;
     }
 }
