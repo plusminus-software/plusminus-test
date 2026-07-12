@@ -7,15 +7,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
-import software.plusminus.test.helpers.TestConfiguration;
-import software.plusminus.test.helpers.context.TestContextManager;
-import software.plusminus.test.helpers.data.TestDataManager;
-import software.plusminus.test.helpers.rest.TestRestManager;
-import software.plusminus.test.helpers.security.TestSecurityManager;
+import software.plusminus.test.helper.TestConfiguration;
+import software.plusminus.test.helper.context.TestContext;
+import software.plusminus.test.helper.data.TestData;
+import software.plusminus.test.helper.http.TestWeb;
+import software.plusminus.test.helper.security.TestSecurity;
 
 import java.util.Optional;
 
@@ -26,55 +25,42 @@ import java.util.Optional;
 @Import(TestConfiguration.class)
 public abstract class IntegrationTest {
 
-    @LocalServerPort
-    private int port;
     @Autowired
-    private Optional<TestContextManager> contextManager;
+    private Optional<TestContext> context;
     @Autowired
-    private Optional<TestDataManager> dataManager;
+    private Optional<TestSecurity> security;
     @Autowired
-    private Optional<TestRestManager> restManager;
+    private Optional<TestWeb> web;
     @Autowired
-    private Optional<TestSecurityManager> securityManager;
+    private Optional<TestData> data;
 
     @Before
     @BeforeEach
     public void beforeEach() {
-        contextManager.ifPresent(TestContextManager::init);
+        security.ifPresent(testSecurity -> testSecurity.login("TestUser"));
     }
 
     @After
     @AfterEach
     public void afterEach() {
-        contextManager.ifPresent(TestContextManager::clear);
-        dataManager.ifPresent(TestDataManager::cleanup);
+        context.ifPresent(TestContext::clear);
+        security.ifPresent(TestSecurity::clear);
+        data.ifPresent(TestData::clear);
     }
 
-    protected int port() {
-        return port;
+    public TestContext context() {
+        return context.orElseThrow(() -> new IllegalStateException("No context module present"));
     }
 
-    protected String url() {
-        return "http://localhost:" + port;
+    public TestSecurity security() {
+        return security.orElseThrow(() -> new IllegalStateException("No security module present"));
     }
 
-    public TestContextManager context() {
-        return contextManager
-                .orElseThrow(() -> new IllegalStateException("No context module present"));
+    public TestWeb web() {
+        return web.orElseThrow(() -> new IllegalStateException("No web module present"));
     }
 
-    public TestDataManager data() {
-        return dataManager
-                .orElseThrow(() -> new IllegalStateException("No data module present"));
-    }
-
-    public TestRestManager rest() {
-        return restManager
-                .orElseThrow(() -> new IllegalStateException("No rest module present"));
-    }
-
-    public TestSecurityManager security() {
-        return securityManager
-                .orElseThrow(() -> new IllegalStateException("No security module present"));
+    public TestData data() {
+        return data.orElseThrow(() -> new IllegalStateException("No data module present"));
     }
 }

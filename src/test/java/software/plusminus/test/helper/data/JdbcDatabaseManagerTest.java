@@ -1,4 +1,4 @@
-package software.plusminus.test.helpers.data;
+package software.plusminus.test.helper.data;
 
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;

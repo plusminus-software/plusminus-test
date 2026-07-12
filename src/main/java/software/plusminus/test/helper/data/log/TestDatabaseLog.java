@@ -1,6 +1,6 @@
-package software.plusminus.test.helpers.data;
+package software.plusminus.test.helper.data.log;
 
-import software.plusminus.test.helpers.TestHelper;
+import software.plusminus.test.helper.TestHelper;
 
 import javax.annotation.Nullable;
 

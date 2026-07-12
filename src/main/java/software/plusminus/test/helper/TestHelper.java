@@ -1,4 +1,4 @@
-package software.plusminus.test.helpers;
+package software.plusminus.test.helper;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;

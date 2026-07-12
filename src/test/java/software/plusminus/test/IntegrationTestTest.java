@@ -2,10 +2,10 @@ package software.plusminus.test;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
-import software.plusminus.test.helpers.context.TestContextManager;
-import software.plusminus.test.helpers.data.TestDataManager;
-import software.plusminus.test.helpers.rest.TestRestManager;
-import software.plusminus.test.helpers.security.TestSecurityManager;
+import software.plusminus.test.helper.context.TestContext;
+import software.plusminus.test.helper.data.TestData;
+import software.plusminus.test.helper.http.TestWeb;
+import software.plusminus.test.helper.security.TestSecurity;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,22 +16,20 @@ class IntegrationTestTest extends IntegrationTest {
 
     @Test
     void allFieldsPresent() {
-        TestContextManager contextManager = context();
+        TestContext contextManager = context();
         checkListField(contextManager, "contexts");
 
-        TestDataManager databaseManager = data();
-        checkOptionalField(databaseManager, "databaseHelper");
-        checkOptionalField(databaseManager, "databaseLog");
-        checkOptionalField(databaseManager, "entityManager");
-        checkOptionalField(databaseManager, "transactionHelper");
+        TestData databaseManager = data();
+        checkOptionalField(databaseManager, "database");
+        checkOptionalField(databaseManager, "log");
+        checkOptionalField(databaseManager, "transaction");
 
-        TestRestManager restManager = rest();
-        checkOptionalField(restManager, "pageRestTemplate");
+        TestWeb webManager = web();
+        checkOptionalField(webManager, "pageRestTemplate");
 
-        TestSecurityManager securityManager = security();
-        checkField(securityManager, "securityContext");
-        checkListField(securityManager, "tokenProcessors");
-        checkOptionalField(securityManager, "issuerContext");
+        TestSecurity securityManager = security();
+        checkField(securityManager, "securityService");
+        checkField(securityManager, "tokenProcessors");
     }
 
     private void checkField(Object targetObject, String fieldName) {
@@ -48,6 +46,6 @@ class IntegrationTestTest extends IntegrationTest {
     private void checkOptionalField(Object targetObject, String fieldName) {
         Object field = ReflectionTestUtils.getField(targetObject, fieldName);
         check(field).isNotNull();
-        check((Optional<?>) field).isPresent();
+        check((Optional<?>) field).isNotEmpty();
     }
 }

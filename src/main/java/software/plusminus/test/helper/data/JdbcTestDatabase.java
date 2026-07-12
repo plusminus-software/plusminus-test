@@ -1,4 +1,4 @@
-package software.plusminus.test.helpers.data;
+package software.plusminus.test.helper.data;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.AllArgsConstructor;
@@ -18,7 +18,7 @@ import javax.sql.DataSource;
 
 @AllArgsConstructor
 @SuppressFBWarnings("SQL_INJECTION_JDBC")
-public class JdbcDatabaseHelper implements TestDatabaseHelper {
+public class JdbcTestDatabase implements TestDatabase {
 
     private static final String POSTGRESQL = "postgresql";
     private static final String MYSQL = "mysql";
@@ -30,7 +30,7 @@ public class JdbcDatabaseHelper implements TestDatabaseHelper {
     private DataSource dataSource;
 
     @Override
-    public void cleanupDatabase() {
+    public void clear() {
         try (Connection connection = dataSource.getConnection()) {
             connection.setAutoCommit(false);
             String dbName = connection.getMetaData().getDatabaseProductName().toLowerCase();

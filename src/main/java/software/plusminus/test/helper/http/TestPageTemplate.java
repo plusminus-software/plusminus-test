@@ -1,4 +1,4 @@
-package software.plusminus.test.helpers.rest;
+package software.plusminus.test.helper.http;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
@@ -8,7 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
-import software.plusminus.test.helpers.TestHelper;
+import software.plusminus.test.helper.TestHelper;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @ConditionalOnClass(Page.class)
 @Component
-public class TestPageRestTemplate implements TestHelper {
+public class TestPageTemplate implements TestHelper {
 
     private ObjectMapper objectMapper;
     private TestRestTemplate testRestTemplate;

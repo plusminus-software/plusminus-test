@@ -1,16 +1,17 @@
-package software.plusminus.test.helpers.data;
+package software.plusminus.test.helper.data;
 
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import software.plusminus.test.IntegrationTest;
 import software.plusminus.test.fixtures.TestEntity;
+import software.plusminus.test.helper.data.log.HibernateTestDatabaseLog;
 
 import static software.plusminus.check.Checks.check;
 
-public class HibernateDatabaseLogTest extends IntegrationTest {
+public class HibernateTestDatabaseLogTest extends IntegrationTest {
 
     @Autowired
-    private HibernateDatabaseLog databaseLog;
+    private HibernateTestDatabaseLog databaseLog;
     @Autowired
     private TestEntityManager entityManager;
 

@@ -15,82 +15,98 @@
  */
 package software.plusminus.test;
 
-import lombok.experimental.Delegate;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import software.plusminus.selenium.Findable;
-import software.plusminus.selenium.Finder;
-import software.plusminus.selenium.Selenium;
-import software.plusminus.selenium.WebElement;
-import software.plusminus.selenium.model.WebTestOptions;
+import org.junit.Before;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import software.plusminus.authentication.service.token.HttpTokenContext;
+import software.plusminus.browser.Browser;
+import software.plusminus.browser.BrowserCookies;
+import software.plusminus.browser.BrowserSettings;
+import software.plusminus.browser.Find;
+import software.plusminus.browser.Finder;
+import software.plusminus.browser.Page;
+import software.plusminus.security.Security;
 import software.plusminus.test.annotation.TestBrowser;
 import software.plusminus.util.AnnotationUtils;
 
-public abstract class BrowserTest extends IntegrationTest implements Findable {
+import java.util.Arrays;
+import java.util.HashSet;
 
-    private static Selenium staticSelenium;
-    
-    @Delegate
-    private Selenium selenium;
+@Slf4j
+public abstract class BrowserTest extends IntegrationTest implements Finder {
 
-    @BeforeClass
-    public static void startSelenium() {
-        staticSelenium = new Selenium();
+    private static Browser browser;
+
+    @Override
+    @Before
+    @BeforeEach
+    @SuppressFBWarnings(value = "ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD",
+            justification = "One browser is shared per class and closed in @AfterClass; "
+                    + "JUnit runs the class lifecycle single-threaded.")
+    public void beforeEach() {
+        if (browser == null) {
+            browser = Browser.create(settings());
+        }
+        browser.go(url());
+    }
+
+    @Override
+    @After
+    @AfterEach
+    public void afterEach() {
+        super.afterEach();
+        browser.cookies().clear();
     }
 
     @AfterClass
-    public static void closeSelenium() {
-        if (staticSelenium.driver() != null) {
-            staticSelenium.closeBrowser();
+    @AfterAll
+    public static void closeBrowser() {
+        browser.close();
+    }
+
+    @Override
+    public Find find() {
+        return browser.currentPage().find();
+    }
+
+    public Browser browser() {
+        return browser;
+    }
+
+    public void login(String username, String... roles) {
+        login(Security.builder()
+                .username(username)
+                .roles(new HashSet<>(Arrays.asList(roles)))
+                .build());
+    }
+
+    public void login(Security security) {
+        if (security().canGenerateToken()) {
+            BrowserCookies cookies = browser.cookies();
+            cookies.add(HttpTokenContext.COOKIE_NAME, security().generateToken(security));
+        } else {
+            security().login(security);
         }
-        staticSelenium = null;
     }
 
-    @Override
-    public void beforeEach() {
-        super.beforeEach();
-        WebTestOptions options = mergedOptions();
-        if (selenium == null) {
-            selenium = staticSelenium;
-            openBrowser(options);
-        }
-        loadPage(options, url());
+    protected Page go(String page) {
+        return browser.go(page);
     }
 
-    @Override
-    public void afterEach() {
-        super.afterEach();
-        checkErrorsInLogs();
-    }
-
-    @Override
-    public Finder find() {
-        return new Finder(selenium);
-    }
-    
-    public WebElement wrap(org.openqa.selenium.WebElement canonical) {
-        return WebElement.of(canonical, selenium);
-    }
-
-    protected WebTestOptions options() {
-        return new WebTestOptions()
-                .port(port());
-    }
-
-    @Override
-    protected abstract String url();
-    
-    private WebTestOptions mergedOptions() {
-        WebTestOptions options = options();
-        mergeTestBrowserAnnotation(options);
-        return options;
-    }
-    
-    private void mergeTestBrowserAnnotation(WebTestOptions options) {
+    protected BrowserSettings settings() {
+        BrowserSettings settings = BrowserSettings.build()
+                .port(web().port());
         TestBrowser testBrowser = AnnotationUtils.findAnnotation(TestBrowser.class, this);
-        if (testBrowser == null) {
-            return;
+        if (testBrowser != null) {
+            settings.headless(testBrowser.headless());
         }
-        options.headlessBrowser(testBrowser.headless());
+        return settings;
     }
+
+    protected abstract String url();
 }

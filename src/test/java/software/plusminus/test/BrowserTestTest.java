@@ -1,22 +1,16 @@
 package software.plusminus.test;
 
 import org.junit.Test;
-import software.plusminus.selenium.model.WebTestOptions;
+import software.plusminus.browser.BrowserSettings;
 
 import static software.plusminus.check.Checks.check;
 
 public class BrowserTestTest extends BrowserTest {
 
     @Override
-    public void beforeEach() {
-        data().tenant().switchOffHibernateFilters();
-        super.beforeEach();
-    }
-
-    @Override
-    protected WebTestOptions options() {
-        return super.options()
-                .logsFilter(log -> !log.getMessage().contains("favicon"));
+    protected BrowserSettings settings() {
+        return super.settings()
+                .logsFilter(message -> !message.contains("favicon"));
     }
 
     @Override
@@ -26,7 +20,7 @@ public class BrowserTestTest extends BrowserTest {
 
     @Test
     public void seleniumLoads() {
-        String body = find("body").one().getText();
+        String body = find("body").one().text();
         check(body).is("Hello");
     }
 }

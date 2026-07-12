@@ -76,13 +76,7 @@
         </dependency>
         <dependency>
             <groupId>software.plusminus</groupId>
-            <artifactId>plusminus-jwt</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>software.plusminus</groupId>
-            <artifactId>plusminus-tenant</artifactId>
+            <artifactId>plusminus-authentication</artifactId>
             <version>1.0-SNAPSHOT</version>
             <optional>true</optional>
         </dependency>
@@ -123,4 +117,19 @@
             <optional>true</optional>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Fork tests into separate JVMs: each fork gets an isolated in-memory database,
+                 Spring context and browser, so classes can run in parallel without cross-test races. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <forkCount>1C</forkCount>
+                    <reuseForks>true</reuseForks>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

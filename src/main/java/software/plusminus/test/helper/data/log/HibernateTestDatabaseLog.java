@@ -1,4 +1,4 @@
-package software.plusminus.test.helpers.data;
+package software.plusminus.test.helper.data.log;
 
 import org.hibernate.resource.jdbc.spi.StatementInspector;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -10,7 +10,7 @@ import javax.annotation.Nullable;
 
 @ConditionalOnClass(StatementInspector.class)
 @Component
-public class HibernateDatabaseLog implements TestDatabaseLog, StatementInspector {
+public class HibernateTestDatabaseLog implements TestDatabaseLog, StatementInspector {
 
     private static final ThreadLocal<List<String>> QUERIES = new ThreadLocal<>();
 

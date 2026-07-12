@@ -1,4 +1,4 @@
-package software.plusminus.test.helpers.rest;
+package software.plusminus.test.helper.http;
 
 import org.junit.Test;
 import org.springframework.data.domain.Page;
@@ -11,9 +11,9 @@ public class TestRestTemplateTestPage extends IntegrationTest {
 
     @Test
     public void getPage() {
-        data().tenant().switchOffHibernateFilters();
-        Page<TestEntity> page = rest().pageRestTemplate().getForGenericObject(
-                url() + "/page?size={size}&page={page}", Page.class, TestEntity.class, 1, 2);
+        TestWeb http = web();
+        Page<TestEntity> page = http.pageTemplate().getForGenericObject(
+                http.url() + "/page?size={size}&page={page}", Page.class, TestEntity.class, 1, 2);
         check(page.getTotalPages()).is(3);
         check(page.getNumber()).is(2);
         check(page.getTotalElements()).is(3);
