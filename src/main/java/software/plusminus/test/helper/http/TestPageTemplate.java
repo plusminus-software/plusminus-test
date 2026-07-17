@@ -3,6 +3,7 @@ package software.plusminus.test.helper.http;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -16,6 +17,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
+@ConditionalOnWebApplication
 @ConditionalOnClass(Page.class)
 @Component
 public class TestPageTemplate implements TestHelper {
