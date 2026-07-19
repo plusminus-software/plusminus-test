@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.sql.DataSource;
@@ -59,7 +60,7 @@ public class JdbcTestDatabase implements TestDatabase {
         }
         String updatedQuery = originalQuery;
         for (Object parameter : parameters) {
-            updatedQuery = updatedQuery.replaceFirst("\\?", parameter.toString());
+            updatedQuery = updatedQuery.replaceFirst("\\?", Matcher.quoteReplacement(parameter.toString()));
         }
         return updatedQuery;
     }

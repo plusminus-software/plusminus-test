@@ -60,13 +60,19 @@ public abstract class BrowserTest extends IntegrationTest implements Finder {
     @AfterEach
     public void afterEach() {
         super.afterEach();
-        browser.cookies().clear();
+        if (browser != null) {
+            browser.cookies().clear();
+        }
     }
 
     @AfterClass
     @AfterAll
     public static void closeBrowser() {
-        browser.close();
+        Browser current = browser;
+        browser = null;
+        if (current != null) {
+            current.close();
+        }
     }
 
     @Override

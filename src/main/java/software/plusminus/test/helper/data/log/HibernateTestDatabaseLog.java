@@ -4,37 +4,38 @@ import org.hibernate.resource.jdbc.spi.StatementInspector;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Deque;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import javax.annotation.Nullable;
 
 @ConditionalOnClass(StatementInspector.class)
 @Component
 public class HibernateTestDatabaseLog implements TestDatabaseLog, StatementInspector {
 
-    private static final ThreadLocal<List<String>> QUERIES = new ThreadLocal<>();
+    /*
+     * Shared across threads (and across the two instances that exist at runtime: the Spring bean
+     * that tests autowire, and the separate instance Hibernate creates as its StatementInspector).
+     * A previous ThreadLocal implementation captured SQL keyed by the executing thread, so for
+     * RANDOM_PORT integration tests - where Hibernate runs on servlet worker threads - the SQL was
+     * invisible to the reading test thread. A static, thread-safe deque makes capture thread-agnostic
+     * while still working for same-thread usage.
+     */
+    private static final Deque<String> QUERIES = new ConcurrentLinkedDeque<>();
 
     @Override
     public String inspect(String sql) {
-        if (QUERIES.get() == null) {
-            QUERIES.set(new ArrayList<>());
-        }
-        QUERIES.get().add(sql);
+        QUERIES.add(sql);
         return sql;
     }
 
     @Override
     @Nullable
     public String getLastSql() {
-        List<String> queries = QUERIES.get();
-        if (queries == null || queries.isEmpty()) {
-            return null;
-        }
-        return queries.get(queries.size() - 1);
+        return QUERIES.peekLast();
     }
 
     @Override
     public void clear() {
-        QUERIES.remove();
+        QUERIES.clear();
     }
 }

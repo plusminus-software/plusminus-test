@@ -1,12 +1,17 @@
 package software.plusminus.test.helper.security;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import software.plusminus.security.service.TokenContext;
 import software.plusminus.test.helper.TestHelper;
 
 import javax.annotation.Nullable;
 
-@ConditionalOnMissingBean(TokenContext.class)
+/**
+ * Default fallback {@link TokenContext} used in integration tests when the application
+ * under test does not provide its own. Registered as a bean via
+ * {@link software.plusminus.test.helper.TestConfiguration#testTokenContext()} with
+ * {@code @ConditionalOnMissingBean(TokenContext.class)}, so {@code TestSecurity} receives it
+ * and the token-login branch actually runs.
+ */
 public class TestTokenContext implements TokenContext, TestHelper {
 
     private static final ThreadLocal<String> TOKEN = new ThreadLocal<>();
