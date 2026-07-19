@@ -2,8 +2,10 @@ package software.plusminus.test.helper.security;
 
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import software.plusminus.authentication.service.token.HttpTokenContext;
 import software.plusminus.context.Context;
 import software.plusminus.security.Security;
+import software.plusminus.security.service.TokenContext;
 import software.plusminus.test.IntegrationTest;
 
 import java.util.Optional;
@@ -15,11 +17,15 @@ public class TestSecurityTest extends IntegrationTest {
     @Autowired
     private Context<Security> securityContext;
     @Autowired
-    private Optional<TestTokenContext> tokenContext;
+    private Optional<TestTokenContext> testTokenContext;
+    @Autowired
+    private Optional<TokenContext> tokenContext;
 
     @Test
-    public void tokenContextIsRegisteredAsFallbackBean() {
+    public void testTokenContextBacksOffWhenTokenContextIsPresent() {
         check(tokenContext.isPresent()).isTrue();
+        check(tokenContext.get() instanceof HttpTokenContext).isTrue();
+        check(testTokenContext.isPresent()).isFalse();
     }
 
     @Test
