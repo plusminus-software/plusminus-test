@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.stereotype.Component;
+import software.plusminus.authentication.service.token.HttpTokenContext;
+import software.plusminus.browser.BrowserCookies;
 import software.plusminus.security.Security;
 import software.plusminus.security.service.SecurityService;
 import software.plusminus.security.service.TokenProcessor;
@@ -40,6 +42,21 @@ public class TestSecurity implements TestHelper {
             tokenContexts.forEach(context -> context.setToken(token));
         } else {
             when(securityService.getSecurity()).thenReturn(security);
+        }
+    }
+
+    public void login(BrowserCookies cookies, String username, String... roles) {
+        login(cookies, Security.builder()
+                .username(username)
+                .roles(new HashSet<>(Arrays.asList(roles)))
+                .build());
+    }
+
+    public void login(BrowserCookies cookies, Security security) {
+        if (canGenerateToken()) {
+            cookies.add(HttpTokenContext.COOKIE_NAME, generateToken(security));
+        } else {
+            login(security);
         }
     }
 

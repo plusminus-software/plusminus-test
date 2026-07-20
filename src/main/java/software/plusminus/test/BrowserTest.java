@@ -23,19 +23,13 @@ import org.junit.Before;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import software.plusminus.authentication.service.token.HttpTokenContext;
 import software.plusminus.browser.Browser;
-import software.plusminus.browser.BrowserCookies;
 import software.plusminus.browser.BrowserSettings;
 import software.plusminus.browser.Find;
 import software.plusminus.browser.Finder;
 import software.plusminus.browser.Page;
-import software.plusminus.security.Security;
 import software.plusminus.test.annotation.TestBrowser;
 import software.plusminus.util.AnnotationUtils;
-
-import java.util.Arrays;
-import java.util.HashSet;
 
 @Slf4j
 public abstract class BrowserTest extends IntegrationTest implements Finder {
@@ -85,19 +79,7 @@ public abstract class BrowserTest extends IntegrationTest implements Finder {
     }
 
     public void login(String username, String... roles) {
-        login(Security.builder()
-                .username(username)
-                .roles(new HashSet<>(Arrays.asList(roles)))
-                .build());
-    }
-
-    public void login(Security security) {
-        if (security().canGenerateToken()) {
-            BrowserCookies cookies = browser.cookies();
-            cookies.add(HttpTokenContext.COOKIE_NAME, security().generateToken(security));
-        } else {
-            security().login(security);
-        }
+        security().login(browser.cookies(), username, roles);
     }
 
     protected Page go(String page) {
