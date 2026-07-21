@@ -1,9 +1,7 @@
 package software.plusminus.test;
 
 import org.junit.After;
-import org.junit.Before;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -33,12 +31,6 @@ public abstract class IntegrationTest {
     private Optional<TestWeb> web;
     @Autowired
     private Optional<TestData> data;
-
-    @Before
-    @BeforeEach
-    public void beforeEach() {
-        security.ifPresent(testSecurity -> testSecurity.login("TestUser"));
-    }
 
     @After
     @AfterEach

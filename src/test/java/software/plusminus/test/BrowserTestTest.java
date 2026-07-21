@@ -13,13 +13,9 @@ public class BrowserTestTest extends BrowserTest {
                 .logsFilter(message -> !message.contains("favicon"));
     }
 
-    @Override
-    protected String url() {
-        return "/";
-    }
-
     @Test
     public void seleniumLoads() {
+        go("/");
         String body = find("body").one().text();
         check(body).is("Hello");
     }

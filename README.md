@@ -17,7 +17,8 @@ JUnit 5 lifecycles: the base classes carry both sets of annotations.
 - `web()` — `TestWeb`: server `port()`, base `url()`, `pageTemplate()`
 - `data()` — `TestData`: database cleanup, `log()`, `transaction()`
 
-Before each test the security module (when present) logs in `TestUser`; after each test the
+Tests run unauthenticated by default — call `security().login(username, roles...)`
+explicitly when a test needs an authenticated user. After each test the
 context, security and data modules are cleared automatically.
 
 ```java

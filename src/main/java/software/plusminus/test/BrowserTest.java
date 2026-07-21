@@ -36,9 +36,9 @@ public abstract class BrowserTest extends IntegrationTest implements Finder {
 
     private static Browser browser;
 
-    @Override
     @Before
     @BeforeEach
+    @SuppressWarnings("java:S2696")
     @SuppressFBWarnings(value = "ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD",
             justification = "One browser is shared per class and closed in @AfterClass; "
                     + "JUnit runs the class lifecycle single-threaded.")
@@ -46,7 +46,6 @@ public abstract class BrowserTest extends IntegrationTest implements Finder {
         if (browser == null) {
             browser = Browser.create(settings());
         }
-        browser.go(url());
     }
 
     @Override
@@ -95,6 +94,4 @@ public abstract class BrowserTest extends IntegrationTest implements Finder {
         }
         return settings;
     }
-
-    protected abstract String url();
 }
