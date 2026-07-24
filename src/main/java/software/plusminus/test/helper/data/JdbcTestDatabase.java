@@ -33,17 +33,22 @@ public class JdbcTestDatabase implements TestDatabase {
     @Override
     public void clear() {
         try (Connection connection = dataSource.getConnection()) {
+            boolean originalAutoCommit = connection.getAutoCommit();
             connection.setAutoCommit(false);
-            String dbName = connection.getMetaData().getDatabaseProductName().toLowerCase();
-            if (!SUPPORTED_DBS.contains(dbName)) {
-                throw new IllegalStateException("Unsupported DB: " + dbName);
+            try {
+                String dbName = connection.getMetaData().getDatabaseProductName().toLowerCase();
+                if (!SUPPORTED_DBS.contains(dbName)) {
+                    throw new IllegalStateException("Unsupported DB: " + dbName);
+                }
+                disableForeignKeys(connection, dbName);
+                List<String> tableNames = getAllTableNames(connection, dbName);
+                truncateTables(connection, dbName, tableNames);
+                resetSequences(connection, dbName);
+                enableForeignKeys(connection, dbName);
+                connection.commit();
+            } finally {
+                connection.setAutoCommit(originalAutoCommit);
             }
-            disableForeignKeys(connection, dbName);
-            List<String> tableNames = getAllTableNames(connection, dbName);
-            truncateTables(connection, dbName, tableNames);
-            resetSequences(connection, dbName);
-            enableForeignKeys(connection, dbName);
-            connection.commit();
         } catch (SQLException e) {
             throw new IllegalStateException(e);
         }
@@ -106,7 +111,7 @@ public class JdbcTestDatabase implements TestDatabase {
                     continue;
                 }
                 if (dbName.contains(POSTGRESQL)) {
-                    stmt.execute(deletePrefix + table + " RESTART IDENTITY CASCADE");
+                    stmt.execute("TRUNCATE TABLE " + table + " RESTART IDENTITY CASCADE");
                 } else if (dbName.contains(MYSQL)) {
                     stmt.execute(deletePrefix + table);
                 } else if (dbName.contains(H2)) {

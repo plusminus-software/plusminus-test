@@ -37,21 +37,18 @@ only when actually called.
 ## BrowserTest
 
 `BrowserTest` extends `IntegrationTest` and drives a Selenium browser (via `plusminus-selenium`).
-One browser instance is shared per test class and closed after the class; before each test it
-navigates to `url()`, and cookies are cleared after each test. Useful methods: `find(...)`,
-`browser()`, `go(page)`, `login(username, roles...)` and an overridable `settings()`. Annotate the
-test class with `@TestBrowser(headless = true)` to run headless.
+One browser instance is shared per test class and closed after the class; the browser is created
+before each test and its cookies are cleared after each test. There is no automatic navigation —
+call `go(page)` to navigate to a page. Useful methods: `find(...)`, `browser()`, `go(page)`,
+`login(username, roles...)` and an overridable `settings()`. Annotate the test class with
+`@TestBrowser(headless = true)` to run headless.
 
 ```java
 public class HomePageTest extends BrowserTest {
 
-    @Override
-    protected String url() {
-        return "/";
-    }
-
     @Test
     public void rendersGreeting() {
+        go("/");
         check(find("body").one().text()).is("Hello");
     }
 }
@@ -64,6 +61,20 @@ test classpath: `TestSecurity` and `TestSecurityConfiguration` are guarded by `@
 so projects without it work out of the box and need no extra dependencies. For the same reason
 `BrowserTest.login(username, roles...)` deliberately keeps security classes out of method
 signatures, so JUnit can reflect over the test class without them.
+
+## Security note on the bundled test keys
+
+This module ships throwaway RSA key pairs (`test_private_key.pem`, `test_private_key_pkcs8.pem`,
+`test_public_key.pem`) as classpath resources, and the `integration-test` profile wires the private
+key as the JWT signing key (`plusminus.jwt.privateKey`). These keys are committed to source control
+and therefore **publicly known** — they exist only so integration and browser tests can mint and
+verify JWTs deterministically.
+
+Because plusminus-test is meant to be depended on with `<scope>test</scope>`, these resources should
+only ever reach a project's test classpath. **Never enable the `test` or `integration-test` Spring
+profiles in a production (or any internet-facing) deployment**, and never reuse these keys for
+anything real — doing so would let anyone forge valid tokens. Production deployments must supply
+their own private key via `plusminus.jwt.privateKey`.
 
 ## Getting started
 

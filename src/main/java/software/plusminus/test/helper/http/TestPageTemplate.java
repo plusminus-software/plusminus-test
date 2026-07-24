@@ -37,8 +37,9 @@ public class TestPageTemplate implements TestHelper {
                     .collect(Collectors.toList());
             return (T) new PageImpl<>(
                     content,
-                    PageRequest.of((Integer) responseBody.get("number"), (Integer) responseBody.get("size")),
-                    (Integer) responseBody.get("totalElements")
+                    PageRequest.of(((Number) responseBody.get("number")).intValue(),
+                            ((Number) responseBody.get("size")).intValue()),
+                    ((Number) responseBody.get("totalElements")).longValue()
             );
         }
         throw new IllegalArgumentException("Unknown response type " + responseType);
