@@ -11,7 +11,8 @@ public interface TestHelper {
     default void foolproof(Environment environment) {
         boolean isTestEnvironment = Arrays.asList(environment.getActiveProfiles()).contains("test");
         if (!isTestEnvironment) {
-            throw new IllegalStateException("TestHelper must run only in the scope of 'test' profile");
+            throw new IllegalStateException(getClass().getSimpleName()
+                    + " must run only in the scope of 'test' profile");
         }
     }
 }

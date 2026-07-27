@@ -2,6 +2,7 @@ package software.plusminus.test.helper.data;
 
 import org.junit.Test;
 import software.plusminus.test.helper.data.log.TestDatabaseLog;
+import software.plusminus.test.helper.data.tenant.TestTenant;
 
 import java.util.Optional;
 
@@ -16,28 +17,42 @@ public class TestDataTest {
         TestDatabase database = mock(TestDatabase.class);
         TestDatabaseLog log = mock(TestDatabaseLog.class);
         TestTransaction transaction = new TestTransaction();
-        TestData data = new TestData(Optional.of(database), Optional.of(log), Optional.of(transaction));
+        TestTenant tenant = new TestTenant();
+        TestData data = new TestData(Optional.of(database), Optional.of(log), Optional.of(transaction),
+                Optional.of(tenant));
+        tenant.use("some tenant");
 
         check(data.log() == log).isTrue();
         check(data.transaction() == transaction).isTrue();
+        check(data.tenant() == tenant).isTrue();
 
         data.clear();
         verify(database).clear();
         verify(log).clear();
+        check(tenant.currentTenant()).isNull();
     }
 
     @Test
     public void clearWithoutHelpersDoesNothing() {
-        new TestData(Optional.empty(), Optional.empty(), Optional.empty()).clear();
+        empty().clear();
     }
 
     @Test(expected = IllegalStateException.class)
     public void logThrowsWhenAbsent() {
-        new TestData(Optional.empty(), Optional.empty(), Optional.empty()).log();
+        empty().log();
     }
 
     @Test(expected = IllegalStateException.class)
     public void transactionThrowsWhenAbsent() {
-        new TestData(Optional.empty(), Optional.empty(), Optional.empty()).transaction();
+        empty().transaction();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void tenantThrowsWhenAbsent() {
+        empty().tenant();
+    }
+
+    private TestData empty() {
+        return new TestData(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
     }
 }

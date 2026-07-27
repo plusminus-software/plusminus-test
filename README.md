@@ -15,7 +15,7 @@ JUnit 5 lifecycles: the base classes carry both sets of annotations.
 - `context()` — `TestContext`: sets and clears `plusminus-context` contexts
 - `security()` — `TestSecurity`: logs a user in, by token or by mocking `SecurityService`
 - `web()` — `TestWeb`: server `port()`, base `url()`, `pageTemplate()`
-- `data()` — `TestData`: database cleanup, `log()`, `transaction()`
+- `data()` — `TestData`: database cleanup, `log()`, `transaction()`, `tenant()`
 
 Tests run unauthenticated by default — call `security().login(username, roles...)`
 explicitly when a test needs an authenticated user. After each test the
@@ -33,6 +33,11 @@ public class ServerTest extends IntegrationTest {
 
 Each module is optional: if its beans are not present, the accessor throws `IllegalStateException`
 only when actually called.
+
+`data().tenant().use(tenant)` pins the current tenant for the calling thread. It is registered as
+the highest-priority `TenantProvider`, but reports nothing until a test calls `use`, so a test that
+never touches it keeps resolving the tenant the way the application does — from the security
+context, the request URL and so on.
 
 ## BrowserTest
 

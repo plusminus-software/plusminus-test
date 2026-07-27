@@ -16,7 +16,7 @@ public class BrowserTestTest extends BrowserTest {
     @Test
     public void seleniumLoads() {
         go("/");
-        String body = find("body").one().text();
+        String body = find("body").text();
         check(body).is("Hello");
     }
 }
