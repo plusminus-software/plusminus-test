@@ -2,7 +2,7 @@ package software.plusminus.test.helper.data;
 
 import org.junit.Test;
 import software.plusminus.test.helper.data.log.TestDatabaseLog;
-import software.plusminus.test.helper.data.tenant.TestTenant;
+import software.plusminus.test.helper.data.tenant.ThreadLocalTestTenant;
 
 import java.util.Optional;
 
@@ -17,7 +17,7 @@ public class TestDataTest {
         TestDatabase database = mock(TestDatabase.class);
         TestDatabaseLog log = mock(TestDatabaseLog.class);
         TestTransaction transaction = new TestTransaction();
-        TestTenant tenant = new TestTenant();
+        ThreadLocalTestTenant tenant = new ThreadLocalTestTenant();
         TestData data = new TestData(Optional.of(database), Optional.of(log), Optional.of(transaction),
                 Optional.of(tenant));
         tenant.use("some tenant");
