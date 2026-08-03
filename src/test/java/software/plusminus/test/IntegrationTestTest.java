@@ -47,6 +47,6 @@ class IntegrationTestTest extends IntegrationTest {
     private void checkOptionalField(Object targetObject, String fieldName) {
         Object field = ReflectionTestUtils.getField(targetObject, fieldName);
         check(field).isNotNull();
-        check((Optional<?>) field).isNotEmpty();
+        check((Optional<?>) field).isPresent();
     }
 }
