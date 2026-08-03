@@ -71,7 +71,7 @@ signatures, so JUnit can reflect over the test class without them.
 
 This module ships throwaway RSA key pairs (`test_private_key.pem`, `test_private_key_pkcs8.pem`,
 `test_public_key.pem`) as classpath resources, and the `integration-test` profile wires the private
-key as the JWT signing key (`plusminus.jwt.privateKey`). These keys are committed to source control
+key as the JWT signing key (`jwt.privateKey`). These keys are committed to source control
 and therefore **publicly known** — they exist only so integration and browser tests can mint and
 verify JWTs deterministically.
 
@@ -79,7 +79,7 @@ Because plusminus-test is meant to be depended on with `<scope>test</scope>`, th
 only ever reach a project's test classpath. **Never enable the `test` or `integration-test` Spring
 profiles in a production (or any internet-facing) deployment**, and never reuse these keys for
 anything real — doing so would let anyone forge valid tokens. Production deployments must supply
-their own private key via `plusminus.jwt.privateKey`.
+their own private key via `jwt.privateKey`.
 
 ## Getting started
 
