@@ -25,11 +25,14 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import software.plusminus.browser.Browser;
 import software.plusminus.browser.BrowserSettings;
+import software.plusminus.browser.BrowserStorage;
 import software.plusminus.browser.Find;
 import software.plusminus.browser.Finder;
 import software.plusminus.browser.Page;
 import software.plusminus.test.annotation.TestBrowser;
 import software.plusminus.util.AnnotationUtils;
+
+import java.util.List;
 
 @Slf4j
 public abstract class BrowserTest extends IntegrationTest implements Finder {
@@ -53,8 +56,21 @@ public abstract class BrowserTest extends IntegrationTest implements Finder {
     @AfterEach
     public void afterEach() {
         super.afterEach();
-        if (browser != null) {
+        if (browser == null) {
+            return;
+        }
+        try {
+            List<String> errors = browser.log().readAll();
+            if (!errors.isEmpty()) {
+                throw new AssertionError("expected: <no errors in logs> but was: <" + errors + ">");
+            }
+        } finally {
+            BrowserStorage storage = browser.storage();
+            storage.clearIndexedDb();
+            storage.clearLocalStorage();
+            storage.clearSessionStorage();
             browser.cookies().clear();
+            browser.log().clear();
         }
     }
 
