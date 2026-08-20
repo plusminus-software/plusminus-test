@@ -76,12 +76,8 @@ public abstract class BrowserTest extends IntegrationTest implements Finder {
 
     @AfterClass
     @AfterAll
-    public static void closeBrowser() {
-        Browser current = browser;
+    public static void releaseBrowser() {
         browser = null;
-        if (current != null) {
-            current.close();
-        }
     }
 
     @Override
