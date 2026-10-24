@@ -1,19 +1,20 @@
 package software.plusminus.test.helper.context;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
-import software.plusminus.context.ClearableContext;
-import software.plusminus.context.ConstantContext;
 import software.plusminus.context.Context;
-import software.plusminus.context.ThreadLocalContext;
-import software.plusminus.context.WritableContext;
 import software.plusminus.spring.SpringUtil;
 import software.plusminus.test.helper.TestHelper;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
@@ -23,10 +24,9 @@ public class TestContext implements TestHelper {
 
     private List<Context<?>> contexts;
 
+    @SuppressWarnings("unchecked")
     public void clear() {
-        contexts.stream()
-                .filter(ClearableContext.class::isInstance)
-                .forEach(context -> ((ClearableContext<?>) context).clear());
+        ((ThreadLocal<Object>) readField(scopeClass(), "CURRENT", null)).remove();
     }
 
     public <T> void set(T value) {
@@ -41,41 +41,38 @@ public class TestContext implements TestHelper {
         set(filteredContexts.get(0), value);
     }
 
-    private <T> void set(Context<T> context, T value) {
-        if (context instanceof WritableContext) {
-            ((WritableContext<T>) context).set(value);
-        } else if (context instanceof ThreadLocalContext) {
-            setThreadLocalValue((ThreadLocalContext<T>) context, value);
-        } else if (context instanceof ConstantContext) {
-            setField(context, "value", value);
-        } else {
-            throw new IllegalStateException("Unsupported context type: " + context.getClass());
-        }
-    }
-
     @SuppressWarnings("unchecked")
-    private <T> void setThreadLocalValue(ThreadLocalContext<T> context, T value) {
-        ThreadLocal<T> threadLocal = (ThreadLocal<T>) readField(context, "threadLocal");
-        threadLocal.set(value);
-    }
-
-    private Object readField(Object target, String fieldName) {
-        Field field = findField(target, fieldName);
-        ReflectionUtils.makeAccessible(field);
-        return ReflectionUtils.getField(field, target);
-    }
-
-    private void setField(Object target, String fieldName, Object value) {
-        Field field = findField(target, fieldName);
-        ReflectionUtils.makeAccessible(field);
-        ReflectionUtils.setField(field, target, value);
-    }
-
-    private Field findField(Object target, String fieldName) {
-        Field field = ReflectionUtils.findField(target.getClass(), fieldName);
-        if (field == null) {
-            throw new IllegalStateException("No field '" + fieldName + "' on " + target.getClass());
+    @SuppressFBWarnings(value = "NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE",
+            justification = "Static members are accessed with a null target")
+    private <T> void set(Context<T> context, T value) {
+        Object scope = ((ThreadLocal<Object>) readField(scopeClass(), "CURRENT", null)).get();
+        if (scope == null) {
+            Method open = Objects.requireNonNull(ReflectionUtils.findMethod(scopeClass(), "open", Map.class));
+            ReflectionUtils.makeAccessible(open);
+            scope = ReflectionUtils.invokeMethod(open, null, new HashMap<>());
         }
-        return field;
+        ((Map<Context<?>, Object>) readField(scopeClass(), "bound", scope)).put(context, value);
+    }
+
+    private static Class<?> scopeClass() {
+        try {
+            return Class.forName("software.plusminus.context.ThreadLocalScope", true,
+                    Context.class.getClassLoader());
+        } catch (ClassNotFoundException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    private static Object readField(Class<?> type, String name, Object target) {
+        Field field = ReflectionUtils.findField(type, name);
+        if (field == null) {
+            throw new IllegalStateException("No field '" + name + "' on " + type);
+        }
+        ReflectionUtils.makeAccessible(field);
+        Object value = ReflectionUtils.getField(field, target);
+        if (value == null) {
+            throw new IllegalStateException("Field '" + name + "' is null on " + type);
+        }
+        return value;
     }
 }

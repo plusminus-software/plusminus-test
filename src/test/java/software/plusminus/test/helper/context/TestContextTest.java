@@ -1,10 +1,8 @@
 package software.plusminus.test.helper.context;
 
+import org.junit.After;
 import org.junit.Test;
-import software.plusminus.context.ConstantContext;
 import software.plusminus.context.Context;
-import software.plusminus.context.ThreadLocalContext;
-import software.plusminus.context.WritableContext;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -13,48 +11,52 @@ import static software.plusminus.check.Checks.check;
 
 public class TestContextTest {
 
+    private final StringContext stringContext = new StringContext();
+    private final IntContext intContext = new IntContext();
+
+    @After
+    public void tearDown() {
+        new TestContext(Collections.emptyList()).clear();
+    }
+
     @Test
-    public void setWritableContext() {
-        StringWritableContext context = new StringWritableContext();
-        TestContext testContext = new TestContext(Collections.singletonList(context));
+    public void setBindsValueForTheTestThread() {
+        TestContext testContext = new TestContext(Collections.singletonList(stringContext));
 
         testContext.set("hello");
 
-        check(context.get()).is("hello");
+        check(stringContext.get()).is("hello");
     }
 
     @Test
-    public void setThreadLocalContext() {
-        IntThreadLocalContext context = new IntThreadLocalContext();
-        TestContext testContext = new TestContext(Collections.singletonList(context));
+    public void setPicksContextByValueType() {
+        TestContext testContext = new TestContext(Arrays.asList(stringContext, intContext));
 
         testContext.set(42);
+        testContext.set("hello");
 
-        check(context.get()).is(42);
+        check(intContext.get()).is(42);
+        check(stringContext.get()).is("hello");
     }
 
     @Test
-    public void setConstantContext() {
-        LongConstantContext context = new LongConstantContext();
-        TestContext testContext = new TestContext(Collections.singletonList(context));
+    public void setValueIsVisibleInsideBlocks() {
+        TestContext testContext = new TestContext(Collections.singletonList(stringContext));
+        testContext.set("hello");
 
-        testContext.set(7L);
-
-        check(context.get()).is(7L);
+        Context.run(() -> check(stringContext.get()).is("hello"));
     }
 
     @Test
-    public void clearOnlyAffectsClearableContexts() {
-        IntThreadLocalContext clearable = new IntThreadLocalContext();
-        StringWritableContext notClearable = new StringWritableContext();
-        TestContext testContext = new TestContext(Arrays.asList(clearable, notClearable));
+    public void clearRestoresOwnValues() {
+        TestContext testContext = new TestContext(Arrays.asList(stringContext, intContext));
+        testContext.set("hello");
         testContext.set(5);
-        notClearable.set("keep");
 
         testContext.clear();
 
-        check(clearable.get()).isNull();
-        check(notClearable.get()).is("keep");
+        check(stringContext.get()).is("own");
+        check(intContext.get()).is(-1);
     }
 
     @Test(expected = IllegalStateException.class)
@@ -64,46 +66,22 @@ public class TestContextTest {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void setThrowsForUnsupportedContextType() {
-        TestContext testContext = new TestContext(Collections.singletonList(new CharContext()));
-        testContext.set('a');
+    public void setThrowsWhenSeveralContextsMatchType() {
+        TestContext testContext = new TestContext(Arrays.asList(new StringContext(), new StringContext()));
+        testContext.set("ambiguous");
     }
 
-    private static class StringWritableContext implements WritableContext<String> {
-        private String value;
-
+    private static class StringContext implements Context<String> {
         @Override
-        public String get() {
-            return value;
-        }
-
-        @Override
-        public void set(String newValue) {
-            this.value = newValue;
-        }
-
-        @Override
-        public void replace(String newValue) {
-            this.value = newValue;
+        public String supply() {
+            return "own";
         }
     }
 
-    private static class IntThreadLocalContext extends ThreadLocalContext<Integer> {
-        IntThreadLocalContext() {
-            super(new ThreadLocal<>());
-        }
-    }
-
-    private static class LongConstantContext extends ConstantContext<Long> {
-        LongConstantContext() {
-            super(0L);
-        }
-    }
-
-    private static class CharContext implements Context<Character> {
+    private static class IntContext implements Context<Integer> {
         @Override
-        public Character get() {
-            return 'x';
+        public Integer supply() {
+            return -1;
         }
     }
 }
